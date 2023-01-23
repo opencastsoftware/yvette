@@ -1,0 +1,6 @@
+.gradle/
+.idea/
+.vscode/
+bin/
+build/
+.jqwik-database
