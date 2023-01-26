@@ -3,6 +3,7 @@ package com.opencastsoftware.yvette;
 import org.junit.jupiter.api.Test;
 
 import com.jparams.verifier.tostring.ToStringVerifier;
+import com.opencastsoftware.yvette.handlers.graphical.StyledRange;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 

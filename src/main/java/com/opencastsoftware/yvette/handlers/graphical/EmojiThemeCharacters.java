@@ -1,34 +1,34 @@
-package com.opencastsoftware.yvette;
+package com.opencastsoftware.yvette.handlers.graphical;
 
-public final class AsciiThemeCharacters implements ThemeCharacters {
-    private static final String hBar = "-";
-    private static final String vBar = "|";
-    private static final String xBar = "+";
-    private static final String vBarBreak = ":";
+public final class EmojiThemeCharacters implements ThemeCharacters {
+    private static final String hBar = "─";
+    private static final String vBar = "│";
+    private static final String xBar = "┼";
+    private static final String vBarBreak = "·";
 
-    private static final String upArrow = "^";
-    private static final String rightArrow = ">";
+    private static final String upArrow = "▲";
+    private static final String rightArrow = "▶";
 
-    private static final String leftTop = ",";
-    private static final String middleTop = "v";
-    private static final String rightTop = ".";
-    private static final String leftBottom = "`";
-    private static final String rightBottom = "\\";
-    private static final String middleBottom = "^";
+    private static final String leftTop = "╭";
+    private static final String middleTop = "┬";
+    private static final String rightTop = "╮";
+    private static final String leftBottom = "╰";
+    private static final String rightBottom = "┴";
+    private static final String middleBottom = "╯";
 
     private static final String leftBox = "[";
     private static final String rightBox = "]";
 
-    private static final String leftCross = "|";
-    private static final String rightCross = "|";
+    private static final String leftCross = "├";
+    private static final String rightCross = "┤";
 
-    private static final String underBar = "|";
-    private static final String underLine = "^";
+    private static final String underBar = "┬";
+    private static final String underLine = "─";
 
-    private static final String error = "x";
-    private static final String warning = "!";
-    private static final String info = "i";
-    private static final String hint = ">";
+    private static final String error = "❌";
+    private static final String warning = "️⚠️";
+    private static final String info = "ℹ️";
+    private static final String hint = "💡";
 
     public String hBar() {
         return hBar;
@@ -120,16 +120,16 @@ public final class AsciiThemeCharacters implements ThemeCharacters {
 
     @Override
     public boolean equals(Object obj) {
-        return this == obj || obj instanceof AsciiThemeCharacters;
+        return this == obj || obj instanceof EmojiThemeCharacters;
     }
 
     @Override
     public int hashCode() {
-        return 31 * AsciiThemeCharacters.class.hashCode();
+        return 31 * EmojiThemeCharacters.class.hashCode();
     }
 
     @Override
     public String toString() {
-        return "AsciiThemeCharacters []";
+        return "EmojiThemeCharacters []";
     }
 }

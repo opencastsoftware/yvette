@@ -1,4 +1,6 @@
-package com.opencastsoftware.yvette;
+package com.opencastsoftware.yvette.handlers.graphical;
+
+import com.opencastsoftware.yvette.Severity;
 
 public interface ThemeCharacters {
     String hBar();

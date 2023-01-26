@@ -6,7 +6,7 @@
 [![javadoc](https://javadoc.io/badge2/com.opencastsoftware/yvette/javadoc.svg)](https://javadoc.io/doc/com.opencastsoftware/yvette)
 [![License](https://img.shields.io/github/license/opencastsoftware/yvette?color=blue)](https://spdx.org/licenses/Apache-2.0.html)
 
-A diagnostic reporting library for Java, inspired by the Rust library [miette](https://github.com/zkat/miette).
+A diagnostic reporting library for Java, ported from the Rust library [miette](https://github.com/zkat/miette).
 
 ## Installation
 
@@ -27,6 +27,8 @@ Maven (pom.xml):
 ## Usage
 
 ## Acknowlegements
+
+This project wouldn't exist without the work of [zkat](https://github.com/zkat) and the other miette contributors.
 
 ## License
 

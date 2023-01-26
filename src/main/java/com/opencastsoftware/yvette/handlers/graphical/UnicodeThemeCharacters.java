@@ -1,6 +1,6 @@
-package com.opencastsoftware.yvette;
+package com.opencastsoftware.yvette.handlers.graphical;
 
-public final class EmojiThemeCharacters implements ThemeCharacters {
+public final class UnicodeThemeCharacters implements ThemeCharacters {
     private static final String hBar = "─";
     private static final String vBar = "│";
     private static final String xBar = "┼";
@@ -25,10 +25,10 @@ public final class EmojiThemeCharacters implements ThemeCharacters {
     private static final String underBar = "┬";
     private static final String underLine = "─";
 
-    private static final String error = "❌";
-    private static final String warning = "️⚠️";
-    private static final String info = "ℹ️";
-    private static final String hint = "💡";
+    private static final String error = "×";
+    private static final String warning = "⚠";
+    private static final String info = "ℹ";
+    private static final String hint = "☞";
 
     public String hBar() {
         return hBar;
@@ -120,16 +120,16 @@ public final class EmojiThemeCharacters implements ThemeCharacters {
 
     @Override
     public boolean equals(Object obj) {
-        return this == obj || obj instanceof EmojiThemeCharacters;
+        return this == obj || obj instanceof UnicodeThemeCharacters;
     }
 
     @Override
     public int hashCode() {
-        return 31 * EmojiThemeCharacters.class.hashCode();
+        return 31 * UnicodeThemeCharacters.class.hashCode();
     }
 
     @Override
     public String toString() {
-        return "EmojiThemeCharacters []";
+        return "UnicodeThemeCharacters []";
     }
 }

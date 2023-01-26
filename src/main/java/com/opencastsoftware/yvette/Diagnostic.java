@@ -4,12 +4,12 @@ import java.net.URI;
 import java.util.Collection;
 
 public abstract class Diagnostic extends RuntimeException {
-    abstract String code();
-    abstract Severity severity();
-    abstract String help();
-    abstract URI url();
-    abstract SourceCode sourceCode();
-    abstract Collection<LabelledRange> labels();
+    public abstract String code();
+    public abstract Severity severity();
+    public abstract String help();
+    public abstract URI url();
+    public abstract SourceCode sourceCode();
+    public abstract Collection<LabelledRange> labels();
 
     public Diagnostic(String message) {
         super(message);

@@ -22,32 +22,32 @@ public class TestDiagnostic extends Diagnostic {
     }
 
     @Override
-    String code() {
+    public String code() {
         return code;
     }
 
     @Override
-    Severity severity() {
+    public Severity severity() {
         return severity;
     }
 
     @Override
-    String help() {
+    public String help() {
         return help;
     }
 
     @Override
-    URI url() {
+    public URI url() {
         return url;
     }
 
     @Override
-    SourceCode sourceCode() {
+    public SourceCode sourceCode() {
         return sourceCode;
     }
 
     @Override
-    List<LabelledRange> labels() {
+    public List<LabelledRange> labels() {
         return labels;
     }
 }

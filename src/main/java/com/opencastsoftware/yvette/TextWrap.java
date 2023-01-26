@@ -1,24 +1,27 @@
 package com.opencastsoftware.yvette;
 
-import org.apache.commons.text.WordUtils;
-import org.fusesource.jansi.Ansi;
+import java.io.IOException;
 
-class TextWrap {
-    static void fill(
-            Ansi ansi, int width,
+import org.apache.commons.text.WordUtils;
+
+public class TextWrap {
+    private TextWrap() {}
+
+    public static void fill(
+            Appendable appendable, int width,
             String initialIndent, String subsequentIndent,
-            String message) {
+            String message) throws IOException {
         String[] lines = message.split("\\r?\\n");
 
-        ansi.append(initialIndent);
+        appendable.append(initialIndent);
 
         int i = 0;
         for (String line : lines) {
             if (i > 0) {
-                ansi.append(subsequentIndent);
+                appendable.append(subsequentIndent);
             }
             String wrapped = WordUtils.wrap(line, width, subsequentIndent, false);
-            ansi.append(wrapped);
+            appendable.append(wrapped);
             i++;
         }
     }

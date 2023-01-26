@@ -1,6 +1,8 @@
-package com.opencastsoftware.yvette;
+package com.opencastsoftware.yvette.handlers;
 
 import java.io.IOException;
+
+import com.opencastsoftware.yvette.Diagnostic;
 
 public class ToStringReportHandler implements ReportHandler {
     @Override

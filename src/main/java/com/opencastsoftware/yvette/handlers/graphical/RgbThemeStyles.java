@@ -1,4 +1,4 @@
-package com.opencastsoftware.yvette;
+package com.opencastsoftware.yvette.handlers.graphical;
 
 import java.util.Collection;
 import java.util.function.UnaryOperator;
@@ -55,9 +55,9 @@ public final class RgbThemeStyles implements ThemeStyles {
     @Override
     public Collection<UnaryOperator<Ansi>> highlights() {
         return Stream.<UnaryOperator<Ansi>>of(
-                ansi -> ansi.fgRgb(246, 87, 248),
-                ansi -> ansi.fgRgb(30, 201, 212),
-                ansi -> ansi.fgRgb(145, 246, 111)).collect(Collectors.toList());
+                ansi -> ansi.fgRgb(246, 87, 248).bold(),
+                ansi -> ansi.fgRgb(30, 201, 212).bold(),
+                ansi -> ansi.fgRgb(145, 246, 111).bold()).collect(Collectors.toList());
     }
 
     @Override

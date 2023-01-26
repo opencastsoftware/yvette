@@ -1,4 +1,4 @@
-package com.opencastsoftware.yvette;
+package com.opencastsoftware.yvette.handlers.graphical;
 
 import org.junit.jupiter.api.Test;
 
@@ -6,14 +6,14 @@ import com.jparams.verifier.tostring.ToStringVerifier;
 
 import nl.jqno.equalsverifier.EqualsVerifier;
 
-public class AsciiThemeCharactersTest {
+public class NoThemeStylesTest {
     @Test
     void testEquals() {
-        EqualsVerifier.forClass(AsciiThemeCharacters.class).verify();
+        EqualsVerifier.forClass(NoThemeStyles.class).verify();
     }
 
     @Test
     void testToString() {
-        ToStringVerifier.forClass(AsciiThemeCharacters.class).verify();
+        ToStringVerifier.forClass(NoThemeStyles.class).verify();
     }
 }

@@ -1,8 +1,12 @@
-package com.opencastsoftware.yvette;
+package com.opencastsoftware.yvette.handlers.graphical;
 
 import java.util.function.UnaryOperator;
 
 import org.fusesource.jansi.Ansi;
+
+import com.opencastsoftware.yvette.LabelledRange;
+import com.opencastsoftware.yvette.Line;
+import com.opencastsoftware.yvette.Position;
 
 public class StyledRange extends LabelledRange {
     private final UnaryOperator<Ansi> style;

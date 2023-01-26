@@ -1,4 +1,4 @@
-package com.opencastsoftware.yvette;
+package com.opencastsoftware.yvette.handlers.graphical;
 
 import java.util.Collection;
 import java.util.function.UnaryOperator;

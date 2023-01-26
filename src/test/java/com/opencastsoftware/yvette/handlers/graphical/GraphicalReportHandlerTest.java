@@ -1,4 +1,4 @@
-package com.opencastsoftware.yvette;
+package com.opencastsoftware.yvette.handlers.graphical;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -12,6 +12,8 @@ import java.util.Collections;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+
+import com.opencastsoftware.yvette.*;
 
 public class GraphicalReportHandlerTest {
     private final GraphicalReportHandler handler = new GraphicalReportHandler(

@@ -1,4 +1,4 @@
-package com.opencastsoftware.yvette;
+package com.opencastsoftware.yvette.handlers.graphical;
 
 import java.io.IOException;
 import java.util.*;
@@ -15,6 +15,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Failable;
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
+
+import com.opencastsoftware.yvette.*;
+import com.opencastsoftware.yvette.handlers.ReportHandler;
 
 public class GraphicalReportHandler implements ReportHandler {
     private final LinkStyle linkStyle;
@@ -94,7 +97,7 @@ public class GraphicalReportHandler implements ReportHandler {
         }
     }
 
-    void renderCauses(Ansi ansi, Diagnostic diagnostic) {
+    void renderCauses(Ansi ansi, Diagnostic diagnostic) throws IOException {
         UnaryOperator<Ansi> severityStyle = diagnostic.severity() == null
                 ? theme.styles().error()
                 : theme.styles().forSeverity(diagnostic.severity());
@@ -118,7 +121,7 @@ public class GraphicalReportHandler implements ReportHandler {
         TextWrap.fill(
                 ansi, lineWidth,
                 initialIndent, subsequentIndent,
-                diagnostic.getMessage());
+                diagnostic.message());
 
         ansi.a(System.lineSeparator());
 
@@ -538,7 +541,7 @@ public class GraphicalReportHandler implements ReportHandler {
         });
     }
 
-    void renderHelp(Ansi ansi, Diagnostic diagnostic) {
+    void renderHelp(Ansi ansi, Diagnostic diagnostic) throws IOException {
         if (diagnostic.help() != null) {
             int lineWidth = Arithmetic.unsignedSaturatingSub(terminalWidth, 4);
 
@@ -561,7 +564,7 @@ public class GraphicalReportHandler implements ReportHandler {
 
     }
 
-    void renderFooter(Ansi ansi) {
+    void renderFooter(Ansi ansi) throws IOException {
         if (this.footer != null) {
             ansi.a(System.lineSeparator());
 
@@ -577,7 +580,7 @@ public class GraphicalReportHandler implements ReportHandler {
         }
     }
 
-    void renderReport(Ansi ansi, Diagnostic diagnostic) {
+    void renderReport(Ansi ansi, Diagnostic diagnostic) throws IOException {
         renderHeader(ansi, diagnostic);
         ansi.a(System.lineSeparator());
         renderCauses(ansi, diagnostic);
