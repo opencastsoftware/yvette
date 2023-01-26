@@ -51,7 +51,7 @@ dependencies {
     "graphicalReportsImplementation"("org.fusesource.jansi:jansi:2.4.0")
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
     testImplementation("org.hamcrest:hamcrest:2.2")
-    testImplementation("nl.jqno.equalsverifier:equalsverifier:3.10.1")
+    testImplementation("nl.jqno.equalsverifier:equalsverifier:3.12.3")
     testImplementation("com.jparams:to-string-verifier:1.4.8")
 }
 
