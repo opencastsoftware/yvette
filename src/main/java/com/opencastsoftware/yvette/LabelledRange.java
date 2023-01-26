@@ -1,28 +1,27 @@
 package com.opencastsoftware.yvette;
 
-public class LabelledRange {
-    private String label;
-    private Range range;
+public class LabelledRange extends Range {
+    private final String label;
+
+    public LabelledRange(String label, Position start, Position end) {
+        super(start, end);
+        this.label = label;
+    }
 
     public LabelledRange(String label, Range range) {
+        super(range.start(), range.end());
         this.label = label;
-        this.range = range;
     }
 
     public String label() {
         return label;
     }
 
-    public Range range() {
-        return range;
-    }
-
     @Override
     public int hashCode() {
         final int prime = 31;
-        int result = 1;
+        int result = super.hashCode();
         result = prime * result + ((label == null) ? 0 : label.hashCode());
-        result = prime * result + ((range == null) ? 0 : range.hashCode());
         return result;
     }
 
@@ -30,7 +29,7 @@ public class LabelledRange {
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
-        if (obj == null)
+        if (!super.equals(obj))
             return false;
         if (getClass() != obj.getClass())
             return false;
@@ -40,16 +39,11 @@ public class LabelledRange {
                 return false;
         } else if (!label.equals(other.label))
             return false;
-        if (range == null) {
-            if (other.range != null)
-                return false;
-        } else if (!range.equals(other.range))
-            return false;
         return true;
     }
 
     @Override
     public String toString() {
-        return "LabeledRange [label=" + label + ", range=" + range + "]";
+        return "LabelledRange [label=" + label + ", start=" + start() + ", end=" + end() + "]";
     }
 }

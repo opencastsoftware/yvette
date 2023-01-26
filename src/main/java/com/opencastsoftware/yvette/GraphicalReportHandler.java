@@ -1,62 +1,100 @@
 package com.opencastsoftware.yvette;
 
 import java.io.IOException;
-import java.net.URI;
+import java.util.*;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
-import org.apache.commons.text.WordUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Failable;
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.AnsiConsole;
 
 public class GraphicalReportHandler implements ReportHandler {
-    private int terminalWidth;
-    private int contextLines;
-    private int tabWidth;
-    private LinkStyle linkStyle;
-    private GraphicalTheme theme;
-    private String footer;
+    private final LinkStyle linkStyle;
+    private final int terminalWidth;
+    private final GraphicalTheme theme;
+    private final String footer;
+    private final int contextLines;
+    private final boolean renderCauseChain;
+
+    private final Pattern ansiEscapePattern = Pattern.compile("\\u001B\\[[;\\d]*m");
 
     public GraphicalReportHandler() {
-        this.terminalWidth = AnsiConsole.getTerminalWidth();
-        this.contextLines = 1;
-        this.tabWidth = 4;
         this.linkStyle = LinkStyle.Link;
-        this.theme = GraphicalTheme.emoji();
+        this.terminalWidth = AnsiConsole.getTerminalWidth();
+        this.theme = GraphicalTheme.getDefault();
+        this.footer = null;
+        this.contextLines = 1;
+        this.renderCauseChain = true;
+    }
+
+    public GraphicalReportHandler(LinkStyle linkStyle, int terminalWidth, GraphicalTheme theme, String footer,
+            int contextLines, boolean renderCauseChain) {
+        this.linkStyle = linkStyle;
+        this.terminalWidth = terminalWidth;
+        this.theme = theme;
+        this.footer = footer;
+        this.contextLines = contextLines;
+        this.renderCauseChain = renderCauseChain;
     }
 
     void renderHeader(Ansi ansi, Diagnostic diagnostic) {
-        UnaryOperator<Ansi> severityStyle = diagnostic.severity() == null ? theme.styles().error()
+        UnaryOperator<Ansi> severityStyle = diagnostic.severity() == null
+                ? theme.styles().error()
                 : theme.styles().forSeverity(diagnostic.severity());
+
         if (linkStyle.equals(LinkStyle.Link) && diagnostic.url() != null) {
-            // OSC 8 ; params ; URI ST
+            /*
+             * Escape sequences for creating hyperlinks in the terminal.
+             *
+             * See https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda for
+             * details of the hyperlink sequences.
+             *
+             * See https://en.wikipedia.org/wiki/ANSI_escape_code#Fe_Escape_sequences for
+             * details of the escape sequences.
+             *
+             * The opening sequence is of the form: OSC 8 ; params ; URI ST
+             */
             ansi.format("\u001b]8;;%s\u001b\\", diagnostic.url());
 
             if (diagnostic.code() != null) {
-                severityStyle.apply(ansi)
-                        .a(diagnostic.code() + " ")
-                        .reset();
+                theme.withStyle(
+                        ansi, severityStyle,
+                        builder -> builder.a(diagnostic.code() + " "));
             }
 
-            theme.styles().link()
-                    .apply(ansi)
-                    .a("(link)")
-                    .reset();
+            theme.withStyle(
+                    ansi, theme.styles().link(),
+                    builder -> builder.a("(link)"));
 
-            // OSC 8 ; ; ST
-            ansi.format("\u001b]8;;\u001b\\");
+            /*
+             * The closing sequence is of the form OSC 8 ; ; ST
+             */
+            ansi.format("\u001b]8;;\u001b\\%n");
 
         } else if (diagnostic.code() != null) {
-            severityStyle.apply(ansi)
-                    .a(diagnostic.code() + " ")
-                    .reset();
+            theme.withStyle(
+                    ansi, severityStyle,
+                    builder -> builder.a(diagnostic.code()));
 
             if (linkStyle.equals(LinkStyle.Text) && diagnostic.url() != null) {
-                ansi.format("(%s)", diagnostic.url());
+                theme.withStyle(
+                        ansi, theme.styles().link(),
+                        builder -> builder.format(" (%s)", diagnostic.url()));
             }
+
+            ansi.a(System.lineSeparator());
         }
     }
 
-    void renderMessage(Ansi stringBuilder, Diagnostic diagnostic) {
+    void renderCauses(Ansi ansi, Diagnostic diagnostic) {
         UnaryOperator<Ansi> severityStyle = diagnostic.severity() == null
                 ? theme.styles().error()
                 : theme.styles().forSeverity(diagnostic.severity());
@@ -65,104 +103,494 @@ public class GraphicalReportHandler implements ReportHandler {
                 ? theme.characters().error()
                 : theme.characters().forSeverity(diagnostic.severity());
 
-        severityStyle
-            .apply(stringBuilder)
-            .format("  %s %s", severityIcon, diagnostic.message())
-            .reset();
+        int lineWidth = Arithmetic.unsignedSaturatingSub(terminalWidth, 2);
+
+        String initialIndent = theme.withStyle(
+                Ansi.ansi(), severityStyle,
+                builder -> builder.format("  %s ", severityIcon))
+                .toString();
+
+        String subsequentIndent = theme.withStyle(
+                Ansi.ansi(), severityStyle,
+                builder -> builder.format("%n  %s ", theme.characters().vBar()))
+                .toString();
+
+        TextWrap.fill(
+                ansi, lineWidth,
+                initialIndent, subsequentIndent,
+                diagnostic.getMessage());
+
+        ansi.a(System.lineSeparator());
+
+        if (!renderCauseChain) {
+            return;
+        }
+
+        Throwable cause = diagnostic.getCause();
+
+        while (cause != null) {
+            Throwable nextCause = cause.getCause();
+
+            if (cause.getMessage() == null) {
+                cause = nextCause;
+                continue;
+            }
+
+            String initialCauseIndent = theme.withStyle(
+                    Ansi.ansi(), severityStyle, builder -> {
+                        return builder.format(
+                                "  %s%s%s ",
+                                nextCause != null
+                                        ? theme.characters().leftCross()
+                                        : theme.characters().leftBottom(),
+                                theme.characters().hBar(),
+                                theme.characters().rightArrow());
+                    })
+                    .toString();
+
+            String subsequentCauseIndent = theme.withStyle(
+                    Ansi.ansi(), severityStyle, builder -> {
+                        return builder.format(
+                                "%n  %s   ",
+                                nextCause != null ? theme.characters().vBar() : " ");
+                    })
+                    .toString();
+
+            TextWrap.fill(
+                    ansi, lineWidth,
+                    initialCauseIndent, subsequentCauseIndent,
+                    cause.getMessage());
+
+            ansi.a(System.lineSeparator());
+
+            cause = nextCause;
+        }
     }
 
-    void renderSnippets(Ansi stringBuilder, Diagnostic diagnostic, SourceCode source) {
+    void renderSnippets(Ansi ansi, Diagnostic diagnostic, SourceCode source) {
+        if (source != null) {
+            if (diagnostic.labels() != null) {
+                List<LabelledRange> labels = diagnostic.labels().stream()
+                        .sorted(Comparator.comparing(Range::start))
+                        .collect(Collectors.toList());
 
-    }
+                List<LabelledRange> contexts = new ArrayList<>();
 
-    void renderFooter(Ansi stringBuilder, Diagnostic diagnostic) {
+                labels.forEach(rightLabel -> {
+                    if (contexts.isEmpty()) {
+                        contexts.add(rightLabel);
+                    } else {
+                        LabelledRange leftLabel = contexts.get(contexts.size() - 1);
+                        Position leftEnd = leftLabel.end();
+                        Position rightEnd = rightLabel.end();
+                        // Snippets will overlap
+                        int leftSnippetEnd = leftLabel.end().line() + contextLines;
+                        int rightSnippetStart = Arithmetic.unsignedSaturatingSub(
+                                rightLabel.start().line(), contextLines);
+                        if (leftSnippetEnd >= rightSnippetStart) {
+                            contexts.remove(contexts.size() - 1);
+                            contexts.add(new LabelledRange(leftLabel.label(), new Range(
+                                    leftLabel.start(),
+                                    ObjectUtils.max(leftEnd, rightEnd))));
+                        } else {
+                            contexts.add(rightLabel);
+                        }
+                    }
+                });
 
-    }
-
-    void renderRelated(Ansi stringBuilder, Diagnostic diagnostic, SourceCode source) {
-
-    }
-
-    void renderReport(Ansi stringBuilder, Diagnostic diagnostic) {
-        renderHeader(stringBuilder, diagnostic);
-
-        stringBuilder.append(System.lineSeparator());
-
-        renderMessage(stringBuilder, diagnostic);
-        renderSnippets(stringBuilder, diagnostic, diagnostic.sourceCode());
-        renderFooter(stringBuilder, diagnostic);
-        renderRelated(stringBuilder, diagnostic, diagnostic.sourceCode());
-
-        if (this.footer != null) {
-            stringBuilder.append(System.lineSeparator());
-
-            int lineWidth = 4 > terminalWidth ? 0 : terminalWidth - 4;
-
-            String twoSpaces = "  ";
-            stringBuilder.append(twoSpaces);
-
-            String indentString = System.lineSeparator() + twoSpaces;
-            String[] lines = footer.split("\\r?\\n");
-
-            for (String line : lines) {
-                String wrapped = WordUtils.wrap(line, lineWidth, indentString, false);
-                stringBuilder.append(wrapped);
+                Failable.stream(contexts).forEach(context -> {
+                    renderContext(ansi, source, context, labels);
+                });
             }
         }
+    }
+
+    void renderContext(Ansi ansi, SourceCode source, LabelledRange context, List<LabelledRange> labels)
+            throws IOException {
+        RangeContents contents = source.readRange(context, contextLines, contextLines);
+
+        List<UnaryOperator<Ansi>> labelStyles = Stream
+                .generate(theme.styles().highlights()::stream)
+                .flatMap(Function.identity())
+                .limit(labels.size())
+                .collect(Collectors.toList());
+
+        List<StyledRange> styledLabels = IntStream
+                .range(0, labels.size())
+                .mapToObj(i -> new StyledRange(labelStyles.get(i), labels.get(i)))
+                .collect(Collectors.toList());
+
+        int maxGutter = 0;
+        for (Line line : contents.lines()) {
+            int numHighlights = 0;
+            for (StyledRange label : styledLabels) {
+                if (!label.spansOnly(line) && label.appliesTo(line)) {
+                    numHighlights++;
+                }
+            }
+            maxGutter = Math.max(maxGutter, numHighlights);
+        }
+
+        int lastLineNumber = 0;
+        if (!contents.lines().isEmpty()) {
+            Line lastLine = contents.lines().get(contents.lines().size() - 1);
+            lastLineNumber = lastLine.lineNumber() + 1;
+        }
+
+        int lineNumberWidth = Integer.toString(lastLineNumber).length();
+
+        ansi.format(
+                "%s%s%s",
+                StringUtils.repeat(' ', lineNumberWidth + 2),
+                theme.characters().leftTop(),
+                theme.characters().hBar());
+
+        if (contents.name() != null) {
+            theme.withStyle(ansi, theme.styles().link(), builder -> {
+                return builder.format(
+                        "[%s:%s:%s]%n",
+                        contents.name(),
+                        contents.range().start().line() + 1,
+                        contents.range().start().character() + 1);
+            });
+        } else if (contents.lines().size() <= 1) {
+            ansi.format(
+                    "%s%n",
+                    StringUtils.repeat(theme.characters().hBar(), 3));
+        } else {
+            ansi.format(
+                    "[%s:%s]%n",
+                    contents.range().start().line() + 1,
+                    contents.range().start().character() + 1);
+        }
+
+        for (Line line : contents.lines()) {
+            renderLineNumber(ansi, lineNumberWidth, line.lineNumber());
+            renderLineGutter(ansi, maxGutter, line, styledLabels);
+            renderLineText(ansi, line);
+
+            List<StyledRange> singleLineLabels = new ArrayList<>();
+            List<StyledRange> multiLineLabels = new ArrayList<>();
+
+            styledLabels.stream()
+                    .filter(label -> label.appliesTo(line))
+                    .forEach(label -> {
+                        if (label.spansOnly(line)) {
+                            singleLineLabels.add(label);
+                        } else {
+                            multiLineLabels.add(label);
+                        }
+                    });
+
+            if (!singleLineLabels.isEmpty()) {
+                renderNoLineNumber(ansi, lineNumberWidth);
+                renderHighlightGutter(ansi, maxGutter, line, styledLabels);
+                renderSingleLineHighlights(ansi, line, lineNumberWidth, maxGutter, singleLineLabels, styledLabels);
+            }
+
+            for (StyledRange highlight : multiLineLabels) {
+                if (highlight.label() != null &&
+                        highlight.finishesBefore(line) &&
+                        !highlight.beginsAfter(line)) {
+                    renderNoLineNumber(ansi, lineNumberWidth);
+                    renderHighlightGutter(ansi, maxGutter, line, styledLabels);
+                    renderMultiLineEnd(ansi, highlight);
+                }
+            }
+        }
+
+        ansi.format(
+                "%s%s%s%n",
+                StringUtils.repeat(' ', lineNumberWidth + 2),
+                theme.characters().leftBottom(),
+                StringUtils.repeat(theme.characters().hBar(), 4));
+    }
+
+    void renderLineNumber(Ansi ansi, int width, int lineNumber) {
+        String lineNumberString = theme.withStyle(
+                Ansi.ansi(), theme.styles().lineNumber(), builder -> {
+                    return builder.format(
+                            "%" + width + "s",
+                            String.valueOf(lineNumber + 1));
+                })
+                .toString();
+
+        ansi.format(
+                " %s %s ",
+                lineNumberString,
+                theme.characters().vBar());
+    }
+
+    void renderNoLineNumber(Ansi ansi, int width) {
+        ansi.format(
+                " %s %s ",
+                StringUtils.repeat(' ', width),
+                theme.characters().vBarBreak());
+    }
+
+    void renderLineGutter(Ansi ansi, int maxGutter, Line line, List<StyledRange> labels) {
+        if (maxGutter > 0) {
+            List<StyledRange> applicableLabels = labels.stream()
+                    .filter(label -> label.appliesTo(line))
+                    .collect(Collectors.toList());
+
+            Ansi lineGutter = Ansi.ansi();
+            boolean arrow = false;
+
+            for (int i = 0; i < applicableLabels.size(); i++) {
+                StyledRange highlight = applicableLabels.get(i);
+
+                if (highlight.beginsAfter(line)) {
+                    String hBar = StringUtils.repeat(
+                            theme.characters().hBar(),
+                            Arithmetic.unsignedSaturatingSub(maxGutter, i));
+
+                    theme.withStyle(lineGutter, highlight.style(), builder -> {
+                        return builder
+                                .a(theme.characters().leftTop())
+                                .a(hBar)
+                                .a(theme.characters().rightArrow());
+                    });
+
+                    arrow = true;
+                    break;
+
+                } else if (highlight.finishesBefore(line)) {
+                    String hBar = StringUtils.repeat(
+                            theme.characters().hBar(),
+                            Arithmetic.unsignedSaturatingSub(maxGutter, i));
+
+                    theme.withStyle(lineGutter, highlight.style(), builder -> {
+                        if (highlight.label() != null) {
+                            builder.a(theme.characters().leftCross());
+                        } else {
+                            builder.a(theme.characters().leftBottom());
+                        }
+
+                        return builder
+                                .a(hBar)
+                                .a(theme.characters().rightArrow());
+                    });
+
+                    arrow = true;
+                    break;
+
+                } else if (highlight.contains(line)) {
+                    theme.withStyle(
+                            lineGutter, highlight.style(),
+                            builder -> builder.a(theme.characters().vBar()));
+                } else {
+                    lineGutter.a(' ');
+                }
+            }
+
+            String gutterString = lineGutter.toString();
+            String strippedGutterString = ansiEscapePattern
+                    .matcher(gutterString)
+                    .replaceAll("");
+
+            int gutterPaddingSize = (arrow ? 1 : 3)
+                    + Arithmetic.unsignedSaturatingSub(maxGutter, strippedGutterString.length());
+
+            String gutterPadding = StringUtils.repeat(' ', gutterPaddingSize);
+
+            ansi.format("%s%s", gutterString, gutterPadding);
+        }
+    }
+
+    void renderHighlightGutter(Ansi ansi, int maxGutter, Line line, List<StyledRange> labels) {
+        if (maxGutter > 0) {
+            List<StyledRange> applicableLabels = labels.stream()
+                    .filter(label -> label.appliesTo(line))
+                    .collect(Collectors.toList());
+
+            Ansi lineGutter = Ansi.ansi();
+
+            for (int i = 0; i < applicableLabels.size(); i++) {
+                StyledRange highlight = applicableLabels.get(i);
+
+                if (!highlight.spansOnly(line) && highlight.finishesBefore(line)) {
+                    String hBar = StringUtils.repeat(
+                            theme.characters().hBar(),
+                            Arithmetic.unsignedSaturatingSub(maxGutter, i) + 2);
+
+                    theme.withStyle(lineGutter, highlight.style(), builder -> {
+                        return builder
+                                .a(theme.characters().leftBottom())
+                                .a(hBar);
+                    });
+
+                    break;
+                } else {
+                    theme.withStyle(
+                            lineGutter, highlight.style(),
+                            builder -> builder.a(theme.characters().vBar()));
+                }
+            }
+
+            String gutterString = lineGutter.toString();
+            String strippedGutterString = ansiEscapePattern
+                    .matcher(gutterString)
+                    .replaceAll("");
+
+            int gutterPaddingSize = Arithmetic.unsignedSaturatingSub(maxGutter + 3, strippedGutterString.length());
+
+            String gutterPadding = StringUtils.repeat(' ', gutterPaddingSize);
+
+            ansi.format("%s%s", gutterString, gutterPadding);
+        }
+    }
+
+    void renderLineText(Ansi ansi, Line line) {
+        ansi.a(line.text()).a(System.lineSeparator());
+    }
+
+    void renderSingleLineHighlights(Ansi ansi, Line line, int lineNumberWidth, int maxGutter,
+            List<StyledRange> singleLiners, List<StyledRange> allLabels) {
+        Ansi underlines = Ansi.ansi();
+        int highest = 0;
+
+        List<SimpleEntry<StyledRange, Integer>> vBarOffsets = new ArrayList<>();
+
+        for (StyledRange highlight : singleLiners) {
+            int charStart = highlight.start().character();
+            int charEnd = highlight.end().character();
+            int start = Math.max(charStart, highest);
+            int end = Math.max(charEnd, start + 1);
+
+            int vBarOffset = (start + end) / 2;
+            int numLeft = vBarOffset - start;
+            int numRight = end - vBarOffset - 1;
+
+            if (start < end) {
+                int marginSize = Arithmetic.unsignedSaturatingSub(start, highest);
+
+                theme.withStyle(underlines, highlight.style(), builder -> {
+                    String underLineChar = theme.characters().underLine();
+
+                    if ((charEnd - charStart) == 0) {
+                        underLineChar = theme.characters().upArrow();
+                    } else if (highlight.label() != null) {
+                        underLineChar = theme.characters().underBar();
+                    }
+
+                    return builder.format(
+                            "%s%s%s%s",
+                            StringUtils.repeat(' ', marginSize),
+                            StringUtils.repeat(theme.characters().underLine(), numLeft),
+                            underLineChar,
+                            StringUtils.repeat(theme.characters().underLine(), numRight));
+                });
+            }
+
+            highest = Math.max(highest, end);
+
+            vBarOffsets.add(new SimpleEntry<>(highlight, vBarOffset));
+        }
+
+        ansi.a(underlines).a(System.lineSeparator());
+
+        ListIterator<StyledRange> reverseIterator = singleLiners.listIterator(singleLiners.size());
+        while (reverseIterator.hasPrevious()) {
+            StyledRange highlight = reverseIterator.previous();
+
+            if (highlight.label() != null) {
+                renderNoLineNumber(ansi, lineNumberWidth);
+                renderHighlightGutter(ansi, maxGutter, line, allLabels);
+
+                int currentOffset = 1;
+                for (SimpleEntry<StyledRange, Integer> entry : vBarOffsets) {
+                    StyledRange offsetHighlight = entry.getKey();
+                    int vBarOffset = entry.getValue();
+
+                    while (currentOffset < (vBarOffset + 1)) {
+                        ansi.a(' ');
+                        currentOffset++;
+                    }
+
+                    if (!offsetHighlight.equals(highlight)) {
+                        theme.withStyle(
+                                ansi, offsetHighlight.style(),
+                                builder -> builder.a(theme.characters().vBar()));
+                        currentOffset++;
+                    } else {
+                        theme.withStyle(ansi, highlight.style(), builder -> {
+                            return builder.format(
+                                    "%s%s %s%n",
+                                    theme.characters().leftBottom(),
+                                    StringUtils.repeat(theme.characters().hBar(), 2),
+                                    highlight.label());
+                        });
+
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    void renderMultiLineEnd(Ansi ansi, StyledRange highlight) {
+        theme.withStyle(ansi, highlight.style(), builder -> {
+            return builder.format(
+                    "%s %s%n",
+                    theme.characters().hBar(),
+                    Optional.ofNullable(highlight.label()).orElse(""));
+        });
+    }
+
+    void renderHelp(Ansi ansi, Diagnostic diagnostic) {
+        if (diagnostic.help() != null) {
+            int lineWidth = Arithmetic.unsignedSaturatingSub(terminalWidth, 4);
+
+            String initialIndent = theme.withStyle(
+                    Ansi.ansi(), theme.styles().help(),
+                    builder -> builder.format("%n  help: ")).toString();
+
+            String subsequentIndent = String.format("%n        ");
+
+            TextWrap.fill(
+                    ansi, lineWidth,
+                    initialIndent, subsequentIndent,
+                    diagnostic.help());
+
+            ansi.a(System.lineSeparator());
+        }
+    }
+
+    void renderRelated(Ansi ansi, Diagnostic diagnostic, SourceCode source) {
+
+    }
+
+    void renderFooter(Ansi ansi) {
+        if (this.footer != null) {
+            ansi.a(System.lineSeparator());
+
+            int lineWidth = Arithmetic.unsignedSaturatingSub(terminalWidth, 4);
+            String indentString = String.format("%n  ");
+
+            TextWrap.fill(
+                    ansi, lineWidth,
+                    indentString, indentString,
+                    this.footer);
+
+            ansi.a(System.lineSeparator());
+        }
+    }
+
+    void renderReport(Ansi ansi, Diagnostic diagnostic) {
+        renderHeader(ansi, diagnostic);
+        ansi.a(System.lineSeparator());
+        renderCauses(ansi, diagnostic);
+        renderSnippets(ansi, diagnostic, diagnostic.sourceCode());
+        renderHelp(ansi, diagnostic);
+        renderRelated(ansi, diagnostic, diagnostic.sourceCode());
+        renderFooter(ansi);
     }
 
     @Override
     public void display(Diagnostic diagnostic, Appendable output) throws IOException {
         StringBuilder stringBuilder = new StringBuilder();
         renderReport(Ansi.ansi(stringBuilder), diagnostic);
-        output.append(stringBuilder.toString());
-    }
-
-    public static void main(String[] args) throws IOException {
-        GraphicalReportHandler handler = new GraphicalReportHandler();
-
-        Diagnostic diagnostic = new Diagnostic() {
-            @Override
-            public String code() {
-                return "E01";
-            }
-
-            @Override
-            public Severity severity() {
-                return Severity.Error;
-            }
-
-            @Override
-            public String help() {
-                return null;
-            }
-
-            @Override
-            public URI url() {
-                return URI.create("https://doc.rust-lang.org/error_codes/E0001.html");
-            }
-
-            @Override
-            public SourceCode sourceCode() {
-                return null;
-            }
-
-            @Override
-            public Iterable<LabelledRange> labels() {
-                return null;
-            }
-
-            @Override
-            public Iterable<Diagnostic> related() {
-                return null;
-            }
-
-            @Override
-            public String message() {
-                return "Oh poopies";
-            }
-        };
-
-        handler.display(diagnostic, System.out);
+        output.append(stringBuilder);
     }
 }

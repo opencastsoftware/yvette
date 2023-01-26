@@ -7,4 +7,9 @@ public class ToStringReportHandler implements ReportHandler {
     public void display(Diagnostic diagnostic, Appendable output) throws IOException {
         output.append(diagnostic.toString());
     }
+
+    @Override
+    public String toString() {
+        return "ToStringReportHandler []";
+    }
 }

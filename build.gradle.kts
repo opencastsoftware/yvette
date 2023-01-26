@@ -35,16 +35,24 @@ gitVersioning.apply {
 
 extra["isReleaseVersion"] = !version.toString().endsWith("SNAPSHOT")
 
-dependencies {
-    implementation("org.apache.commons:commons-text:1.10.0")
-    compileOnly("org.fusesource.jansi:jansi:2.4.0")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
-}
-
 java {
     withJavadocJar()
     withSourcesJar()
     toolchain.languageVersion.set(JavaLanguageVersion.of(8))
+
+    registerFeature("graphicalReports") {
+        usingSourceSet(sourceSets["main"])
+    }
+}
+
+dependencies {
+    implementation("org.apache.commons:commons-lang3:3.12.0")
+    implementation("org.apache.commons:commons-text:1.10.0")
+    "graphicalReportsImplementation"("org.fusesource.jansi:jansi:2.4.0")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
+    testImplementation("org.hamcrest:hamcrest:2.2")
+    testImplementation("nl.jqno.equalsverifier:equalsverifier:3.10.1")
+    testImplementation("com.jparams:to-string-verifier:1.4.8")
 }
 
 publishing {

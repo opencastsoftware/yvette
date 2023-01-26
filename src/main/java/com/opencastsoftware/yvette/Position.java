@@ -1,8 +1,10 @@
 package com.opencastsoftware.yvette;
 
-public class Position {
-    private int line;
-    private int character;
+public class Position implements Comparable<Position> {
+    private final int line;
+    private final int character;
+
+    public static final Position NONE = new Position(-1, -1);
 
     public Position(int line, int character) {
         this.line = line;
@@ -45,5 +47,16 @@ public class Position {
     @Override
     public String toString() {
         return "Position [line=" + line + ", character=" + character + "]";
+    }
+
+    @Override
+    public int compareTo(Position that) {
+        int lineComparison = Integer.compare(this.line(), that.line());
+
+        if (lineComparison != 0) {
+            return lineComparison;
+        } else {
+            return Integer.compare(this.character(), that.character());
+        }
     }
 }

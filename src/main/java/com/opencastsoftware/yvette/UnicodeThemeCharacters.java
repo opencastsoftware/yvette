@@ -1,34 +1,34 @@
 package com.opencastsoftware.yvette;
 
-public class UnicodeThemeCharacters implements ThemeCharacters {
-    String hBar = "─";
-    String vBar = "│";
-    String xBar = "┼";
-    String vBarBreak = "·";
+public final class UnicodeThemeCharacters implements ThemeCharacters {
+    private static final String hBar = "─";
+    private static final String vBar = "│";
+    private static final String xBar = "┼";
+    private static final String vBarBreak = "·";
 
-    String upArrow = "▲";
-    String rightArrow = "▶";
+    private static final String upArrow = "▲";
+    private static final String rightArrow = "▶";
 
-    String leftTop = "╭";
-    String middleTop = "┬";
-    String rightTop = "╮";
-    String leftBottom = "╰";
-    String rightBottom = "┴";
-    String middleBottom = "╯";
+    private static final String leftTop = "╭";
+    private static final String middleTop = "┬";
+    private static final String rightTop = "╮";
+    private static final String leftBottom = "╰";
+    private static final String rightBottom = "┴";
+    private static final String middleBottom = "╯";
 
-    String leftBox = "[";
-    String rightBox = "]";
+    private static final String leftBox = "[";
+    private static final String rightBox = "]";
 
-    String leftCross = "├";
-    String rightCross = "┤";
+    private static final String leftCross = "├";
+    private static final String rightCross = "┤";
 
-    String underBar = "┬";
-    String underLine = "─";
+    private static final String underBar = "┬";
+    private static final String underLine = "─";
 
-    String error = "×";
-    String warning = "⚠";
-    String info = "ℹ";
-    String hint = "☞";
+    private static final String error = "×";
+    private static final String warning = "⚠";
+    private static final String info = "ℹ";
+    private static final String hint = "☞";
 
     public String hBar() {
         return hBar;
@@ -116,5 +116,20 @@ public class UnicodeThemeCharacters implements ThemeCharacters {
 
     public String hint() {
         return hint;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this == obj || obj instanceof UnicodeThemeCharacters;
+    }
+
+    @Override
+    public int hashCode() {
+        return 31 * UnicodeThemeCharacters.class.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "UnicodeThemeCharacters []";
     }
 }

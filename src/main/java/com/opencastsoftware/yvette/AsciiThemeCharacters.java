@@ -1,34 +1,34 @@
 package com.opencastsoftware.yvette;
 
-public class AsciiThemeCharacters implements ThemeCharacters {
-    String hBar = "-";
-    String vBar = "|";
-    String xBar = "+";
-    String vBarBreak = ":";
+public final class AsciiThemeCharacters implements ThemeCharacters {
+    private static final String hBar = "-";
+    private static final String vBar = "|";
+    private static final String xBar = "+";
+    private static final String vBarBreak = ":";
 
-    String upArrow = "^";
-    String rightArrow = ">";
+    private static final String upArrow = "^";
+    private static final String rightArrow = ">";
 
-    String leftTop = ",";
-    String middleTop = "v";
-    String rightTop = ".";
-    String leftBottom = "`";
-    String rightBottom = "\\";
-    String middleBottom = "^";
+    private static final String leftTop = ",";
+    private static final String middleTop = "v";
+    private static final String rightTop = ".";
+    private static final String leftBottom = "`";
+    private static final String rightBottom = "\\";
+    private static final String middleBottom = "^";
 
-    String leftBox = "[";
-    String rightBox = "]";
+    private static final String leftBox = "[";
+    private static final String rightBox = "]";
 
-    String leftCross = "|";
-    String rightCross = "|";
+    private static final String leftCross = "|";
+    private static final String rightCross = "|";
 
-    String underBar = "|";
-    String underLine = "^";
+    private static final String underBar = "|";
+    private static final String underLine = "^";
 
-    String error = "x";
-    String warning = "!";
-    String info = "i";
-    String hint = ">";
+    private static final String error = "x";
+    private static final String warning = "!";
+    private static final String info = "i";
+    private static final String hint = ">";
 
     public String hBar() {
         return hBar;
@@ -116,5 +116,20 @@ public class AsciiThemeCharacters implements ThemeCharacters {
 
     public String hint() {
         return hint;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this == obj || obj instanceof AsciiThemeCharacters;
+    }
+
+    @Override
+    public int hashCode() {
+        return 31 * AsciiThemeCharacters.class.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "AsciiThemeCharacters []";
     }
 }

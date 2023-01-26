@@ -1,49 +1,73 @@
 package com.opencastsoftware.yvette;
 
+import java.util.Collection;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.fusesource.jansi.Ansi;
 
-public enum NoThemeStyles implements ThemeStyles {
-    INSTANCE;
+public final class NoThemeStyles implements ThemeStyles {
+
+    private static final UnaryOperator<Ansi> identity = UnaryOperator.identity();
 
     @Override
     public UnaryOperator<Ansi> error() {
-        return null;
+        return identity;
     }
 
     @Override
     public UnaryOperator<Ansi> warning() {
-        return null;
+        return identity;
     }
 
     @Override
     public UnaryOperator<Ansi> info() {
-        return null;
+        return identity;
     }
 
     @Override
     public UnaryOperator<Ansi> hint() {
-        return null;
+        return identity;
     }
 
     @Override
     public UnaryOperator<Ansi> help() {
-        return null;
+        return identity;
     }
 
     @Override
     public UnaryOperator<Ansi> link() {
-        return null;
+        return identity;
     }
 
     @Override
     public UnaryOperator<Ansi> lineNumber() {
-        return null;
+        return identity;
     }
 
     @Override
-    public Iterable<UnaryOperator<Ansi>> highlights() {
-        return null;
+    public UnaryOperator<Ansi> reset() {
+        return identity;
+    }
+
+    @Override
+    public Collection<UnaryOperator<Ansi>> highlights() {
+        return Stream.of(identity).collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this == obj || obj instanceof NoThemeStyles;
+    }
+
+    @Override
+    public int hashCode() {
+        return 31 * NoThemeStyles.class.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "NoThemeStyles []";
     }
 }

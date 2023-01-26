@@ -1,5 +1,6 @@
 package com.opencastsoftware.yvette;
 
+import java.util.Collection;
 import java.util.function.UnaryOperator;
 
 import org.fusesource.jansi.Ansi;
@@ -12,7 +13,8 @@ public interface ThemeStyles {
     UnaryOperator<Ansi> help();
     UnaryOperator<Ansi> link();
     UnaryOperator<Ansi> lineNumber();
-    Iterable<UnaryOperator<Ansi>> highlights();
+    UnaryOperator<Ansi> reset();
+    Collection<UnaryOperator<Ansi>> highlights();
 
     default UnaryOperator<Ansi> forSeverity(Severity severity) {
         UnaryOperator<Ansi> style = null;
@@ -35,15 +37,15 @@ public interface ThemeStyles {
         return style;
     }
 
-    public static ThemeStyles ansi() {
+    static ThemeStyles ansi() {
         return new AnsiThemeStyles();
     }
 
-    public static ThemeStyles rgb() {
+    static ThemeStyles rgb() {
         return new RgbThemeStyles();
     }
 
-    public static ThemeStyles none() {
-        return NoThemeStyles.INSTANCE;
+    static ThemeStyles none() {
+        return new NoThemeStyles();
     }
 }

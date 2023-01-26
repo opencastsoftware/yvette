@@ -51,15 +51,15 @@ public interface ThemeCharacters {
         return icon;
     }
 
-    public static ThemeCharacters ascii() {
+    static ThemeCharacters ascii() {
         return new AsciiThemeCharacters();
     }
 
-    public static ThemeCharacters unicode() {
+    static ThemeCharacters unicode() {
         return new UnicodeThemeCharacters();
     }
 
-    public static ThemeCharacters emoji() {
+    static ThemeCharacters emoji() {
         return new EmojiThemeCharacters();
     }
 }

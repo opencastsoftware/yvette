@@ -1,7 +1,9 @@
 package com.opencastsoftware.yvette;
 
+import java.util.List;
+
 public interface RangeContents {
     String name();
     Range range();
-    String data();
+    List<Line> lines();
 }

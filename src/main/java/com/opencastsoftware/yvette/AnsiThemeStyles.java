@@ -1,35 +1,36 @@
 package com.opencastsoftware.yvette;
 
+import java.util.Collection;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.fusesource.jansi.Ansi;
 
-public class AnsiThemeStyles implements ThemeStyles {
+public final class AnsiThemeStyles implements ThemeStyles {
     @Override
     public UnaryOperator<Ansi> error() {
-        return ansi -> ansi.fgRed();
+        return Ansi::fgRed;
     }
 
     @Override
     public UnaryOperator<Ansi> warning() {
-        return ansi -> ansi.fgYellow();
+        return Ansi::fgYellow;
     }
 
     @Override
     public UnaryOperator<Ansi> info() {
-        return ansi -> ansi.fgCyan();
+        return Ansi::fgCyan;
     }
 
     @Override
     public UnaryOperator<Ansi> hint() {
-        return ansi -> ansi.fgCyan();
+        return Ansi::fgCyan;
     }
 
     @Override
     public UnaryOperator<Ansi> help() {
-        return ansi -> ansi.fgCyan();
+        return Ansi::fgCyan;
     }
 
     @Override
@@ -45,11 +46,26 @@ public class AnsiThemeStyles implements ThemeStyles {
     }
 
     @Override
-    public Iterable<UnaryOperator<Ansi>> highlights() {
+    public UnaryOperator<Ansi> reset() {
+        return Ansi::reset;
+    }
+
+    @Override
+    public Collection<UnaryOperator<Ansi>> highlights() {
         return Stream.<UnaryOperator<Ansi>>of(
             ansi -> ansi.fgMagenta().bold(),
             ansi -> ansi.fgYellow().bold(),
             ansi -> ansi.fgGreen().bold()
         ).collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this == obj || obj instanceof AnsiThemeStyles;
+    }
+
+    @Override
+    public int hashCode() {
+        return 31 * AnsiThemeStyles.class.hashCode();
     }
 }

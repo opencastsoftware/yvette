@@ -11,7 +11,7 @@ public enum Severity {
     Information(3),
     Hint(4);
 
-    private int code;
+    private final int code;
 
     Severity(int code) {
         this.code = code;
