@@ -8,6 +8,8 @@
 
 A diagnostic reporting library for Java, ported from the Rust library [miette](https://github.com/zkat/miette).
 
+![An example of a graphical error message produced by this library is shown. The error message text is preceded by a red cross symbol. This is followed by the message "Mismatched type! Expected: Int, Actual: Tree\[A\]". Following the error message a source code snippet is printed, headed by a hyperlink pointing to the underlying file and line number that is in error. Line numbers are shown in the margin indicating the location of the snippet in the underlying source file. The specific term in the source code that is in error is underlined using a blue line.](./images/example-report.png)
+
 ## Installation
 
 Gradle (build.gradle / build.gradle.kts):
