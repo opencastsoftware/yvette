@@ -596,4 +596,60 @@ public class GraphicalReportHandler implements ReportHandler {
         renderReport(Ansi.ansi(stringBuilder), diagnostic);
         output.append(stringBuilder);
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((linkStyle == null) ? 0 : linkStyle.hashCode());
+        result = prime * result + terminalWidth;
+        result = prime * result + ((theme == null) ? 0 : theme.hashCode());
+        result = prime * result + ((footer == null) ? 0 : footer.hashCode());
+        result = prime * result + contextLines;
+        result = prime * result + (renderCauseChain ? 1231 : 1237);
+        result = prime * result + ((ansiEscapePattern == null) ? 0 : ansiEscapePattern.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        GraphicalReportHandler other = (GraphicalReportHandler) obj;
+        if (linkStyle != other.linkStyle)
+            return false;
+        if (terminalWidth != other.terminalWidth)
+            return false;
+        if (theme == null) {
+            if (other.theme != null)
+                return false;
+        } else if (!theme.equals(other.theme))
+            return false;
+        if (footer == null) {
+            if (other.footer != null)
+                return false;
+        } else if (!footer.equals(other.footer))
+            return false;
+        if (contextLines != other.contextLines)
+            return false;
+        if (renderCauseChain != other.renderCauseChain)
+            return false;
+        if (ansiEscapePattern == null) {
+            if (other.ansiEscapePattern != null)
+                return false;
+        } else if (!ansiEscapePattern.equals(other.ansiEscapePattern))
+            return false;
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "GraphicalReportHandler [linkStyle=" + linkStyle + ", terminalWidth=" + terminalWidth + ", theme="
+                + theme + ", footer=" + footer + ", contextLines=" + contextLines + ", renderCauseChain="
+                + renderCauseChain + ", ansiEscapePattern=" + ansiEscapePattern + "]";
+    }
 }

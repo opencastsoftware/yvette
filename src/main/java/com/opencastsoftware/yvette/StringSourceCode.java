@@ -23,8 +23,9 @@ public class StringSourceCode implements SourceCode {
             List<String> lines = Arrays.asList(source.split("\\r?\\n"));
             int startLine = Arithmetic.unsignedSaturatingSub(range.start().line(), linesBefore);
             int endLine = Math.min(range.end().line() + linesAfter, lines.size() - 1);
+            int endChar = Math.max(0, lines.get(endLine).length() - 1);
             int spannedLines = endLine - startLine + 1;
-            Range spannedRange = new Range(new Position(startLine, 0), new Position(endLine, 0));
+            Range spannedRange = new Range(new Position(startLine, 0), new Position(endLine, endChar));
             List<Line> retainedLines = IntStream.range(0, lines.size())
                     .skip(startLine)
                     .limit(spannedLines)

@@ -51,6 +51,7 @@ dependencies {
     "graphicalReportsImplementation"("org.fusesource.jansi:jansi:2.4.0")
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
     testImplementation("org.hamcrest:hamcrest:2.2")
+    testImplementation("net.jqwik:jqwik:1.7.2")
     testImplementation("nl.jqno.equalsverifier:equalsverifier:3.12.3")
     testImplementation("com.jparams:to-string-verifier:1.4.8")
 }
@@ -105,7 +106,9 @@ nexusPublishing {
 }
 
 tasks.named<Test>("test") {
-    useJUnitPlatform()
+    useJUnitPlatform() {
+        includeEngines("junit-jupiter", "jqwik")
+    }
 }
 
 tasks.withType<JavaCompile> {

@@ -13,7 +13,10 @@ import java.util.Collections;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import com.jparams.verifier.tostring.ToStringVerifier;
 import com.opencastsoftware.yvette.*;
+
+import nl.jqno.equalsverifier.EqualsVerifier;
 
 public class GraphicalReportHandlerTest {
     private final GraphicalReportHandler handler = new GraphicalReportHandler(
@@ -822,4 +825,15 @@ public class GraphicalReportHandlerTest {
         assertThat(result, not(containsString("(link)")));
         assertThat(result, containsString("oops-my-bad"));
     }
+
+    @Test
+    void testEquals() {
+        EqualsVerifier.forClass(GraphicalReportHandler.class).usingGetClass().verify();
+    }
+
+    @Test
+    void testToString() {
+        ToStringVerifier.forClass(GraphicalReportHandler.class).verify();
+    }
+
 }
