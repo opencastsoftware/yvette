@@ -1,8 +1,7 @@
 package com.opencastsoftware.yvette.handlers.graphical;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
@@ -15,7 +14,13 @@ import org.junit.jupiter.api.Test;
 
 import com.jparams.verifier.tostring.ToStringVerifier;
 import com.opencastsoftware.yvette.*;
+import com.opencastsoftware.yvette.arbitrary.DiagnosticSupplier;
+import com.opencastsoftware.yvette.arbitrary.GraphicalThemeSupplier;
+import com.opencastsoftware.yvette.arbitrary.LinkStyleSupplier;
 
+import net.jqwik.api.ForAll;
+import net.jqwik.api.Property;
+import net.jqwik.api.constraints.IntRange;
 import nl.jqno.equalsverifier.EqualsVerifier;
 
 public class GraphicalReportHandlerTest {
@@ -836,4 +841,27 @@ public class GraphicalReportHandlerTest {
         ToStringVerifier.forClass(GraphicalReportHandler.class).verify();
     }
 
+    @Property
+    void rendersArbitraryDiagnostics(
+            @ForAll(supplier = DiagnosticSupplier.class) Diagnostic diagnostic,
+            @ForAll(supplier = LinkStyleSupplier.class) LinkStyle links,
+            @ForAll @IntRange(min = 0, max = 200) int terminalWidth,
+            @ForAll(supplier = GraphicalThemeSupplier.class) GraphicalTheme theme,
+            @ForAll String footer,
+            @ForAll @IntRange(min = 0, max = 2) int contextLines,
+            @ForAll boolean renderCauseChain) throws IOException {
+        GraphicalReportHandler handler = new GraphicalReportHandler(
+                links,
+                terminalWidth,
+                GraphicalTheme.unicodeNoColour(),
+                footer,
+                contextLines,
+                renderCauseChain);
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        handler.display(diagnostic, stringBuilder);
+
+        assertThat(stringBuilder.toString(), is(not(blankOrNullString())));
+    }
 }
