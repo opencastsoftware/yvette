@@ -21,7 +21,8 @@ public class DiagnosticSupplier implements ArbitrarySupplier<Diagnostic> {
                 Arbitraries.lazy(new URLSupplier()),
                 Arbitraries.lazy(new StringSourceCodeSupplier()))
                 .flatAs((code, severity, message, help, url, sourceCode) -> {
-                    if (sourceCode.source().isEmpty()) {
+                    // This would split to an empty array later
+                    if (sourceCode.source().matches("\\r?\\n")) {
                         return Arbitraries.just(
                                 new TestDiagnostic(
                                         code, severity,

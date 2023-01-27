@@ -3,12 +3,15 @@ package com.opencastsoftware.yvette;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class StringSourceCode implements SourceCode {
     private final String name;
     private final String source;
+
+    private static final Pattern NEWLINE_PATTERN = Pattern.compile("\\r?\\n");
 
     public StringSourceCode(String name, String source) {
         this.name = name;
@@ -20,7 +23,7 @@ public class StringSourceCode implements SourceCode {
         if (source.isEmpty()) {
             return new StringRangeContents(name, range, Collections.emptyList());
         } else {
-            List<String> lines = Arrays.asList(source.split("\\r?\\n"));
+            List<String> lines = Arrays.asList(NEWLINE_PATTERN.split(source));
             int startLine = Arithmetic.unsignedSaturatingSub(range.start().line(), linesBefore);
             int endLine = Math.min(range.end().line() + linesAfter, lines.size() - 1);
             int endChar = Math.max(0, lines.get(endLine).length() - 1);
