@@ -21,6 +21,16 @@ public class TestDiagnostic extends Diagnostic {
         this.labels = labels;
     }
 
+    public TestDiagnostic(String code, Severity severity, String message, Throwable cause, String help, URI url, SourceCode sourceCode, List<LabelledRange> labels) {
+        super(message, cause);
+        this.code = code;
+        this.severity = severity;
+        this.help = help;
+        this.url = url;
+        this.sourceCode = sourceCode;
+        this.labels = labels;
+    }
+
     @Override
     public String code() {
         return code;

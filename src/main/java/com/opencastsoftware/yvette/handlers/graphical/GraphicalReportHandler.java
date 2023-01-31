@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -14,7 +15,6 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.function.Failable;
 import org.fusesource.jansi.Ansi;
-import org.fusesource.jansi.AnsiConsole;
 
 import com.opencastsoftware.yvette.*;
 import com.opencastsoftware.yvette.handlers.ReportHandler;
@@ -28,15 +28,6 @@ public class GraphicalReportHandler implements ReportHandler {
     private final boolean renderCauseChain;
 
     private final Pattern ansiEscapePattern = Pattern.compile("\\u001B\\[[;\\d]*m");
-
-    public GraphicalReportHandler() {
-        this.linkStyle = LinkStyle.Link;
-        this.terminalWidth = AnsiConsole.getTerminalWidth();
-        this.theme = GraphicalTheme.getDefault();
-        this.footer = null;
-        this.contextLines = 1;
-        this.renderCauseChain = true;
-    }
 
     public GraphicalReportHandler(LinkStyle linkStyle, int terminalWidth, GraphicalTheme theme, String footer,
             int contextLines, boolean renderCauseChain) {
@@ -53,7 +44,7 @@ public class GraphicalReportHandler implements ReportHandler {
                 ? theme.styles().error()
                 : theme.styles().forSeverity(diagnostic.severity());
 
-        if (linkStyle.equals(LinkStyle.Link) && diagnostic.url() != null) {
+        if (linkStyle.equals(LinkStyle.HYPERLINK) && diagnostic.url() != null) {
             /*
              * Escape sequences for creating hyperlinks in the terminal.
              *
@@ -87,7 +78,7 @@ public class GraphicalReportHandler implements ReportHandler {
                     ansi, severityStyle,
                     builder -> builder.a(diagnostic.code()));
 
-            if (linkStyle.equals(LinkStyle.Text) && diagnostic.url() != null) {
+            if (linkStyle.equals(LinkStyle.TEXT) && diagnostic.url() != null) {
                 theme.withStyle(
                         ansi, theme.styles().link(),
                         builder -> builder.format(" (%s)", diagnostic.url()));
@@ -98,75 +89,80 @@ public class GraphicalReportHandler implements ReportHandler {
     }
 
     void renderCauses(Ansi ansi, Diagnostic diagnostic) throws IOException {
-        UnaryOperator<Ansi> severityStyle = diagnostic.severity() == null
-                ? theme.styles().error()
-                : theme.styles().forSeverity(diagnostic.severity());
+        if (diagnostic.message() != null) {
+            UnaryOperator<Ansi> severityStyle = diagnostic.severity() == null
+                    ? theme.styles().error()
+                    : theme.styles().forSeverity(diagnostic.severity());
 
-        String severityIcon = diagnostic.severity() == null
-                ? theme.characters().error()
-                : theme.characters().forSeverity(diagnostic.severity());
+            String severityIcon = diagnostic.severity() == null
+                    ? theme.characters().error()
+                    : theme.characters().forSeverity(diagnostic.severity());
 
-        int lineWidth = Arithmetic.unsignedSaturatingSub(terminalWidth, 2);
+            int lineWidth = Arithmetic.unsignedSaturatingSub(terminalWidth, 2);
 
-        String initialIndent = theme.withStyle(
-                Ansi.ansi(), severityStyle,
-                builder -> builder.format("  %s ", severityIcon))
-                .toString();
-
-        String subsequentIndent = theme.withStyle(
-                Ansi.ansi(), severityStyle,
-                builder -> builder.format("%n  %s ", theme.characters().vBar()))
-                .toString();
-
-        TextWrap.fill(
-                ansi, lineWidth,
-                initialIndent, subsequentIndent,
-                diagnostic.message());
-
-        ansi.a(System.lineSeparator());
-
-        if (!renderCauseChain) {
-            return;
-        }
-
-        Throwable cause = diagnostic.getCause();
-
-        while (cause != null) {
-            Throwable nextCause = cause.getCause();
-
-            if (cause.getMessage() == null) {
-                cause = nextCause;
-                continue;
-            }
-
-            String initialCauseIndent = theme.withStyle(
-                    Ansi.ansi(), severityStyle, builder -> {
-                        return builder.format(
-                                "  %s%s%s ",
-                                nextCause != null
-                                        ? theme.characters().leftCross()
-                                        : theme.characters().leftBottom(),
-                                theme.characters().hBar(),
-                                theme.characters().rightArrow());
-                    })
+            String initialIndent = theme.withStyle(
+                    Ansi.ansi(), severityStyle,
+                    builder -> builder.format("  %s ", severityIcon))
                     .toString();
 
-            String subsequentCauseIndent = theme.withStyle(
-                    Ansi.ansi(), severityStyle, builder -> {
-                        return builder.format(
-                                "%n  %s   ",
-                                nextCause != null ? theme.characters().vBar() : " ");
-                    })
+            String subsequentIndent = theme.withStyle(
+                    Ansi.ansi(), severityStyle,
+                    builder -> builder.format("%n  %s ", theme.characters().vBar()))
                     .toString();
 
             TextWrap.fill(
                     ansi, lineWidth,
-                    initialCauseIndent, subsequentCauseIndent,
-                    cause.getMessage());
+                    initialIndent, subsequentIndent,
+                    diagnostic.message());
 
             ansi.a(System.lineSeparator());
 
-            cause = nextCause;
+            if (!renderCauseChain) {
+                return;
+            }
+
+            Throwable cause = diagnostic.getCause();
+
+            while (cause != null) {
+                Throwable nextCause = cause.getCause();
+
+                if (cause.getMessage() == null) {
+                    cause = nextCause;
+                    continue;
+                }
+
+                String initialCauseIndent = theme.withStyle(
+                        Ansi.ansi(), severityStyle, builder -> {
+                            return builder.format(
+                                    "  %s%s%s ",
+                                    nextCause != null &&
+                                            nextCause.getMessage() != null
+                                                    ? theme.characters().leftCross()
+                                                    : theme.characters().leftBottom(),
+                                    theme.characters().hBar(),
+                                    theme.characters().rightArrow());
+                        })
+                        .toString();
+
+                String subsequentCauseIndent = theme.withStyle(
+                        Ansi.ansi(), severityStyle, builder -> {
+                            return builder.format(
+                                    "%n  %s   ",
+                                    nextCause != null && nextCause.getMessage() != null
+                                            ? theme.characters().vBar()
+                                            : " ");
+                        })
+                        .toString();
+
+                TextWrap.fill(
+                        ansi, lineWidth,
+                        initialCauseIndent, subsequentCauseIndent,
+                        cause.getMessage());
+
+                ansi.a(System.lineSeparator());
+
+                cause = nextCause;
+            }
         }
     }
 
@@ -547,7 +543,7 @@ public class GraphicalReportHandler implements ReportHandler {
 
             String initialIndent = theme.withStyle(
                     Ansi.ansi(), theme.styles().help(),
-                    builder -> builder.format("%n  help: ")).toString();
+                    builder -> builder.format("  help: ")).toString();
 
             String subsequentIndent = String.format("%n        ");
 
@@ -569,11 +565,12 @@ public class GraphicalReportHandler implements ReportHandler {
             ansi.a(System.lineSeparator());
 
             int lineWidth = Arithmetic.unsignedSaturatingSub(terminalWidth, 4);
-            String indentString = String.format("%n  ");
+            String initialIndent = "  ";
+            String subsequentIndent = System.lineSeparator() + initialIndent;
 
             TextWrap.fill(
                     ansi, lineWidth,
-                    indentString, indentString,
+                    initialIndent, subsequentIndent,
                     this.footer);
 
             ansi.a(System.lineSeparator());
@@ -650,6 +647,246 @@ public class GraphicalReportHandler implements ReportHandler {
     public String toString() {
         return "GraphicalReportHandler [linkStyle=" + linkStyle + ", terminalWidth=" + terminalWidth + ", theme="
                 + theme + ", footer=" + footer + ", contextLines=" + contextLines + ", renderCauseChain="
-                + renderCauseChain + ", ansiEscapePattern=" + ansiEscapePattern + "]";
+                + renderCauseChain + "]";
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder implements Supplier<GraphicalReportHandler> {
+        private Optional<Boolean> enableTerminalLinks = Optional.empty();
+        private Optional<Integer> terminalWidth = Optional.empty();
+        private Optional<GraphicalTheme> theme = Optional.empty();
+        private Optional<Boolean> enableColours = Optional.empty();
+        private RgbColours rgbColours = RgbColours.NEVER;
+        private Optional<Boolean> enableUnicode = Optional.empty();
+        private String footer = null;
+        private int contextLines = 1;
+        private boolean renderCauseChain = true;
+
+        public Builder withTerminalLinks(boolean enabled) {
+            this.enableTerminalLinks = Optional.of(enabled);
+            return this;
+        }
+
+        public Builder withTerminalWidth(int width) {
+            this.terminalWidth = Optional.of(width);
+            return this;
+        }
+
+        public Builder withGraphicalTheme(GraphicalTheme theme) {
+            this.theme = Optional.of(theme);
+            return this;
+        }
+
+        public Builder withCauseChain(boolean enabled) {
+            this.renderCauseChain = enabled;
+            return this;
+        }
+
+        public Builder withColours(boolean enabled) {
+            this.enableColours = Optional.of(enabled);
+            return this;
+        }
+
+        public Builder withRgbColours(RgbColours rgbColours) {
+            this.rgbColours = rgbColours;
+            return this;
+        }
+
+        public Builder withUnicode(boolean enabled) {
+            this.enableUnicode = Optional.of(enabled);
+            return this;
+        }
+
+        public Builder withFooter(String footer) {
+            this.footer = footer;
+            return this;
+        }
+
+        public Builder withContextLines(int contextLines) {
+            this.contextLines = contextLines;
+            return this;
+        }
+
+        public GraphicalReportHandler buildFor(Appendable output) {
+            int width;
+
+            if (terminalWidth.isPresent()) {
+                width = terminalWidth.get();
+            } else {
+                width = TerminalSupport.terminalWidth(output);
+            }
+
+            LinkStyle linkStyle;
+            if (enableTerminalLinks.isPresent()) {
+                if (enableTerminalLinks.get()) {
+                    linkStyle = LinkStyle.HYPERLINK;
+                } else {
+                    linkStyle = LinkStyle.TEXT;
+                }
+            } else if (TerminalSupport.supportsHyperlinks(output)) {
+                linkStyle = LinkStyle.HYPERLINK;
+            } else {
+                linkStyle = LinkStyle.TEXT;
+            }
+
+            GraphicalTheme graphicalTheme;
+            if (theme.isPresent()) {
+                graphicalTheme = theme.get();
+            } else {
+                ThemeCharacters themeCharacters;
+                if (enableUnicode.isPresent()) {
+                    if (enableUnicode.get()) {
+                        themeCharacters = ThemeCharacters.unicode();
+                    } else {
+                        themeCharacters = ThemeCharacters.ascii();
+                    }
+                } else if (TerminalSupport.supportsUnicode(output)) {
+                    themeCharacters = ThemeCharacters.unicode();
+                } else {
+                    themeCharacters = ThemeCharacters.ascii();
+                }
+
+                ThemeStyles themeStyles;
+                if (enableColours.isPresent() && !enableColours.get()) {
+                    themeStyles = ThemeStyles.none();
+                } else {
+                    ColourSupport colourSupport = TerminalSupport.colourSupport(output);
+
+                    if (!ColourSupport.NONE.equals(colourSupport)) {
+                        if (RgbColours.ALWAYS.equals(rgbColours)) {
+                            themeStyles = ThemeStyles.rgb();
+                        } else if (RgbColours.PREFERRED.equals(rgbColours)
+                                && colourSupport.has16MColourSupport()) {
+                            themeStyles = ThemeStyles.rgb();
+                        } else {
+                            themeStyles = ThemeStyles.ansi();
+                        }
+                    } else if (enableColours.isPresent() && enableColours.get()) {
+                        if (RgbColours.ALWAYS.equals(rgbColours)) {
+                            themeStyles = ThemeStyles.rgb();
+                        } else {
+                            themeStyles = ThemeStyles.ansi();
+                        }
+                    } else {
+                        themeStyles = ThemeStyles.none();
+                    }
+                }
+
+                graphicalTheme = new GraphicalTheme(themeCharacters, themeStyles);
+            }
+
+            return new GraphicalReportHandler(
+                linkStyle,
+                width,
+                graphicalTheme,
+                footer,
+                contextLines,
+                renderCauseChain);
+        }
+
+        @Override
+        public GraphicalReportHandler get() {
+            return buildFor(System.err);
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((enableTerminalLinks == null) ? 0 : enableTerminalLinks.hashCode());
+            result = prime * result + ((terminalWidth == null) ? 0 : terminalWidth.hashCode());
+            result = prime * result + ((theme == null) ? 0 : theme.hashCode());
+            result = prime * result + ((enableColours == null) ? 0 : enableColours.hashCode());
+            result = prime * result + ((rgbColours == null) ? 0 : rgbColours.hashCode());
+            result = prime * result + ((enableUnicode == null) ? 0 : enableUnicode.hashCode());
+            result = prime * result + ((footer == null) ? 0 : footer.hashCode());
+            result = prime * result + contextLines;
+            result = prime * result + (renderCauseChain ? 1231 : 1237);
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            Builder other = (Builder) obj;
+            if (enableTerminalLinks == null) {
+                if (other.enableTerminalLinks != null)
+                    return false;
+            } else if (!enableTerminalLinks.equals(other.enableTerminalLinks))
+                return false;
+            if (terminalWidth == null) {
+                if (other.terminalWidth != null)
+                    return false;
+            } else if (!terminalWidth.equals(other.terminalWidth))
+                return false;
+            if (theme == null) {
+                if (other.theme != null)
+                    return false;
+            } else if (!theme.equals(other.theme))
+                return false;
+            if (enableColours == null) {
+                if (other.enableColours != null)
+                    return false;
+            } else if (!enableColours.equals(other.enableColours))
+                return false;
+            if (rgbColours != other.rgbColours)
+                return false;
+            if (enableUnicode == null) {
+                if (other.enableUnicode != null)
+                    return false;
+            } else if (!enableUnicode.equals(other.enableUnicode))
+                return false;
+            if (footer == null) {
+                if (other.footer != null)
+                    return false;
+            } else if (!footer.equals(other.footer))
+                return false;
+            if (contextLines != other.contextLines)
+                return false;
+            if (renderCauseChain != other.renderCauseChain)
+                return false;
+            return true;
+        }
+
+        @Override
+        public String toString() {
+            return "Builder [enableTerminalLinks=" + enableTerminalLinks + ", terminalWidth=" + terminalWidth
+                    + ", theme=" + theme + ", enableColours=" + enableColours + ", rgbColours=" + rgbColours
+                    + ", enableUnicode=" + enableUnicode + ", footer=" + footer + ", contextLines=" + contextLines
+                    + ", renderCauseChain=" + renderCauseChain + "]";
+        }
+    }
+
+    // Package private; for builder unit tests
+    LinkStyle linkStyle() {
+        return linkStyle;
+    }
+
+    int terminalWidth() {
+        return terminalWidth;
+    }
+
+    GraphicalTheme theme() {
+        return theme;
+    }
+
+    String footer() {
+        return footer;
+    }
+
+    int contextLines() {
+        return contextLines;
+    }
+
+    boolean renderCauseChain() {
+        return renderCauseChain;
     }
 }

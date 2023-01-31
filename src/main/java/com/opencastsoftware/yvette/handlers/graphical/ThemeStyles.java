@@ -9,13 +9,21 @@ import com.opencastsoftware.yvette.Severity;
 
 public interface ThemeStyles {
     UnaryOperator<Ansi> error();
+
     UnaryOperator<Ansi> warning();
+
     UnaryOperator<Ansi> info();
+
     UnaryOperator<Ansi> hint();
+
     UnaryOperator<Ansi> help();
+
     UnaryOperator<Ansi> link();
+
     UnaryOperator<Ansi> lineNumber();
+
     UnaryOperator<Ansi> reset();
+
     Collection<UnaryOperator<Ansi>> highlights();
 
     default UnaryOperator<Ansi> forSeverity(Severity severity) {
@@ -37,6 +45,23 @@ public interface ThemeStyles {
         }
 
         return style;
+    }
+
+    static ThemeStyles forColourLevel(ColourSupport level) {
+        ThemeStyles styles = null;
+
+        switch (level) {
+            case COLOUR_16:
+                styles = ansi();
+            case COLOUR_256:
+                styles = ansi();
+            case COLOUR_16M:
+                styles = rgb();
+            case NONE:
+                styles = none();
+        }
+
+        return styles;
     }
 
     static ThemeStyles ansi() {

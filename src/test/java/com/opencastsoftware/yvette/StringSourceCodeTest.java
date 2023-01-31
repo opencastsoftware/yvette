@@ -26,6 +26,7 @@ public class StringSourceCodeTest {
     @Test
     void testNameString() throws IOException {
         StringSourceCode source = new StringSourceCode("TestSourceCode.java", TEST_SOURCE);
+        assertThat(source.name(), is(equalTo("TestSourceCode.java")));
         StringRangeContents contents = source.readRange(new Range(0, 0, 6, 0), 1, 1);
         assertThat(contents.name(), is(equalTo("TestSourceCode.java")));
     }

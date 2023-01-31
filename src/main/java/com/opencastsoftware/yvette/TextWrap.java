@@ -6,7 +6,8 @@ import java.util.regex.Pattern;
 import org.apache.commons.text.WordUtils;
 
 public class TextWrap {
-    private TextWrap() {}
+    private TextWrap() {
+    }
 
     private static final Pattern NEWLINE_PATTERN = Pattern.compile("\\r?\\n");
 
@@ -18,14 +19,12 @@ public class TextWrap {
 
         appendable.append(initialIndent);
 
-        int i = 0;
-        for (String line : lines) {
+        for (int i = 0; i < lines.length; i++) {
             if (i > 0) {
                 appendable.append(subsequentIndent);
             }
-            String wrapped = WordUtils.wrap(line, width, subsequentIndent, false);
+            String wrapped = WordUtils.wrap(lines[i], width, subsequentIndent, false);
             appendable.append(wrapped);
-            i++;
         }
     }
 }

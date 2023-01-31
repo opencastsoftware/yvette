@@ -1,11 +1,13 @@
 package com.opencastsoftware.yvette.handlers.graphical;
 
-import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.AccessDeniedException;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -24,13 +26,171 @@ import net.jqwik.api.constraints.IntRange;
 import nl.jqno.equalsverifier.EqualsVerifier;
 
 public class GraphicalReportHandlerTest {
-    private final GraphicalReportHandler handler = new GraphicalReportHandler(
-            LinkStyle.Link,
-            80,
-            GraphicalTheme.unicodeNoColour(),
-            null,
-            1,
-            true);
+    private final GraphicalReportHandler handler = GraphicalReportHandler.builder()
+            .withTerminalLinks(true)
+            .withTerminalWidth(80)
+            .withColours(false)
+            .withUnicode(true)
+            .withContextLines(1)
+            .withCauseChain(true)
+            .buildFor(System.err);
+
+    @Test
+    void testCauseChain() throws IOException {
+        Throwable exc = new FileNotFoundException("Couldn't find the file BadFile.java");
+        exc.initCause(new AccessDeniedException("Access denied to file BadFile.java"));
+
+        Diagnostic err = new TestDiagnostic(
+                "oops-my-bad",
+                Severity.Error,
+                "Couldn't attach the source code to your diagnostic",
+                exc,
+                "try doing it better next time?",
+                null,
+                null,
+                Collections.emptyList());
+
+        StringBuilder builder = new StringBuilder();
+        handler.display(err, builder);
+
+        assertEquals(
+                String.join(
+                        System.lineSeparator(),
+                        "oops-my-bad",
+                        "",
+                        "  × Couldn't attach the source code to your diagnostic",
+                        "  ├─▶ Couldn't find the file BadFile.java",
+                        "  ╰─▶ Access denied to file BadFile.java",
+                        "  help: try doing it better next time?",
+                        ""),
+                builder.toString());
+    }
+
+    @Test
+    void testFooter() throws IOException {
+        StringBuilder builder = new StringBuilder();
+
+        GraphicalReportHandler handler = GraphicalReportHandler.builder()
+                .withFooter("This is a footer")
+                .buildFor(builder);
+
+        Throwable exc = new FileNotFoundException("Couldn't find the file BadFile.java");
+        exc.initCause(new AccessDeniedException("Access denied to file BadFile.java"));
+
+        Diagnostic err = new TestDiagnostic(
+                "oops-my-bad",
+                Severity.Error,
+                "Couldn't attach the source code to your diagnostic",
+                exc,
+                "try doing it better next time?",
+                null,
+                null,
+                Collections.emptyList());
+
+        handler.display(err, builder);
+
+        assertEquals(
+                String.join(
+                        System.lineSeparator(),
+                        "oops-my-bad",
+                        "",
+                        "  × Couldn't attach the source code to your diagnostic",
+                        "  ├─▶ Couldn't find the file BadFile.java",
+                        "  ╰─▶ Access denied to file BadFile.java",
+                        "  help: try doing it better next time?",
+                        "",
+                        "  This is a footer",
+                        ""),
+                builder.toString());
+    }
+
+    @Test
+    void testNullMessage() throws IOException {
+        Throwable exc = new FileNotFoundException("Couldn't find the file BadFile.java");
+        exc.initCause(new AccessDeniedException("Access denied to file BadFile.java"));
+
+        Diagnostic err = new TestDiagnostic(
+                "oops-my-bad",
+                Severity.Error,
+                null,
+                exc,
+                "try doing it better next time?",
+                null,
+                null,
+                Collections.emptyList());
+
+        StringBuilder builder = new StringBuilder();
+        handler.display(err, builder);
+
+        assertEquals(
+                String.join(
+                        System.lineSeparator(),
+                        "oops-my-bad",
+                        "",
+                        "  help: try doing it better next time?",
+                        ""),
+                builder.toString());
+    }
+
+    @Test
+    void testCauseChainIgnoresTrailingNullMessage() throws IOException {
+        Throwable exc = new FileNotFoundException("Couldn't find the file BadFile.java");
+        exc.initCause(new AccessDeniedException(null));
+
+        Diagnostic err = new TestDiagnostic(
+                "oops-my-bad",
+                Severity.Error,
+                "Couldn't attach the source code to your diagnostic",
+                exc,
+                "try doing it better next time?",
+                null,
+                null,
+                Collections.emptyList());
+
+        StringBuilder builder = new StringBuilder();
+        handler.display(err, builder);
+
+        assertEquals(
+                String.join(
+                        System.lineSeparator(),
+                        "oops-my-bad",
+                        "",
+                        "  × Couldn't attach the source code to your diagnostic",
+                        "  ╰─▶ Couldn't find the file BadFile.java",
+                        "  help: try doing it better next time?",
+                        ""),
+                builder.toString());
+    }
+
+    @Test
+    void testCauseChainIgnoresMiddleNullMessage() throws IOException {
+        Throwable exc = new FileNotFoundException(null);
+        exc.initCause(new AccessDeniedException("Access denied to file BadFile.java"));
+
+        Diagnostic err = new TestDiagnostic(
+                "oops-my-bad",
+                Severity.Error,
+                "Couldn't attach the source code to your diagnostic",
+                exc,
+                "try doing it better next time?",
+                null,
+                null,
+                Collections.emptyList());
+
+        StringBuilder builder = new StringBuilder();
+        handler.display(err, builder);
+
+        assertEquals(
+                String.join(
+                        System.lineSeparator(),
+                        "oops-my-bad",
+                        "",
+                        "  × Couldn't attach the source code to your diagnostic",
+                        "  ╰─▶ Access denied to file BadFile.java",
+                        "  help: try doing it better next time?",
+                        ""),
+                builder.toString());
+    }
 
     @Test
     void testEmptySource() throws IOException {
@@ -58,7 +218,71 @@ public class GraphicalReportHandlerTest {
                         "  × oops!",
                         "   ╭─[BadFile.java:1:1]",
                         "   ╰────",
+                        "  help: try doing it better next time?",
+                        ""),
+                builder.toString());
+    }
+
+    @Test
+    void testEmptySourceNullName() throws IOException {
+        Diagnostic err = new TestDiagnostic(
+                "oops-my-bad",
+                Severity.Error,
+                "oops!",
+                "try doing it better next time?",
+                null,
+                new StringSourceCode(null, ""),
+                Collections.singletonList(
+                        new LabelledRange(
+                                "this bit here",
+                                new Position(0, 0),
+                                new Position(0, 0))));
+
+        StringBuilder builder = new StringBuilder();
+        handler.display(err, builder);
+
+        assertEquals(
+                String.join(
+                        System.lineSeparator(),
+                        "oops-my-bad",
                         "",
+                        "  × oops!",
+                        "   ╭────",
+                        "   ╰────",
+                        "  help: try doing it better next time?",
+                        ""),
+                builder.toString());
+    }
+
+    @Test
+    void testSingleLineSourceNullName() throws IOException {
+        Diagnostic err = new TestDiagnostic(
+                "oops-my-bad",
+                Severity.Error,
+                "oops!",
+                "try doing it better next time?",
+                null,
+                new StringSourceCode(null, "source"),
+                Collections.singletonList(
+                        new LabelledRange(
+                                "this bit here",
+                                new Position(0, 0),
+                                new Position(0, 0))));
+
+        StringBuilder builder = new StringBuilder();
+        handler.display(err, builder);
+
+        assertEquals(
+                String.join(
+                        System.lineSeparator(),
+                        "oops-my-bad",
+                        "",
+                        "  × oops!",
+                        "   ╭────",
+                        " 1 │ source",
+                        "   · ▲",
+                        "   · ╰── this bit here",
+                        "   ╰────",
                         "  help: try doing it better next time?",
                         ""),
                 builder.toString());
@@ -88,6 +312,84 @@ public class GraphicalReportHandlerTest {
                         "",
                         "  × oops!",
                         "   ╭─[Issue.java:1:1]",
+                        " 1 │ source",
+                        " 2 │ text",
+                        "   · ──┬─",
+                        "   ·   ╰── This bit here",
+                        "   ╰────",
+                        ""),
+                builder.toString());
+    }
+
+    @Test
+    void testSingleLineHighlightsNonOverlapping() throws IOException {
+        Diagnostic err = new TestDiagnostic(
+                null,
+                Severity.Error,
+                "oops!",
+                null,
+                null,
+                new StringSourceCode("Issue.java", "source\ntext\nhere\nand\nsome\nmore"),
+                Arrays.asList(
+                        new LabelledRange(
+                                "This bit here",
+                                new Position(1, 0),
+                                new Position(1, 4)),
+                        new LabelledRange(
+                                "And this bit",
+                                new Position(4, 0),
+                                new Position(4, 4))));
+
+        StringBuilder builder = new StringBuilder();
+        handler.display(err, builder);
+
+        assertEquals(
+                String.join(
+                        System.lineSeparator(),
+                        "",
+                        "  × oops!",
+                        "   ╭─[Issue.java:1:1]",
+                        " 1 │ source",
+                        " 2 │ text",
+                        "   · ──┬─",
+                        "   ·   ╰── This bit here",
+                        " 3 │ here",
+                        "   ╰────",
+                        "   ╭─[Issue.java:4:1]",
+                        " 4 │ and",
+                        " 5 │ some",
+                        "   · ──┬─",
+                        "   ·   ╰── And this bit",
+                        " 6 │ more",
+                        "   ╰────",
+                        ""),
+                builder.toString());
+    }
+
+    @Test
+    void testSingleLineHighlightNullSourceName() throws IOException {
+        Diagnostic err = new TestDiagnostic(
+                null,
+                Severity.Error,
+                "oops!",
+                null,
+                null,
+                new StringSourceCode(null, "source\ntext"),
+                Collections.singletonList(
+                        new LabelledRange(
+                                "This bit here",
+                                new Position(1, 0),
+                                new Position(1, 4))));
+
+        StringBuilder builder = new StringBuilder();
+        handler.display(err, builder);
+
+        assertEquals(
+                String.join(
+                        System.lineSeparator(),
+                        "",
+                        "  × oops!",
+                        "   ╭─[1:1]",
                         " 1 │ source",
                         " 2 │ text",
                         "   · ──┬─",
@@ -129,7 +431,6 @@ public class GraphicalReportHandlerTest {
                         "   ·        ╰── this bit here",
                         " 3 │     here",
                         "   ╰────",
-                        "",
                         "  help: try doing it better next time?",
                         ""),
                 builder.toString());
@@ -168,7 +469,6 @@ public class GraphicalReportHandlerTest {
                         "   ·           ╰── this bit here",
                         " 3 │     here",
                         "   ╰────",
-                        "",
                         "  help: try doing it better next time?",
                         ""),
                 builder.toString());
@@ -207,7 +507,6 @@ public class GraphicalReportHandlerTest {
                         "   ·             ╰── this bit here",
                         " 3 │     here",
                         "   ╰────",
-                        "",
                         "  help: try doing it better next time?",
                         ""),
                 builder.toString());
@@ -244,7 +543,6 @@ public class GraphicalReportHandlerTest {
                         "   ·     ╰── this bit here",
                         " 3 │     here",
                         "   ╰────",
-                        "",
                         "  help: try doing it better next time?",
                         ""),
                 builder.toString());
@@ -280,7 +578,6 @@ public class GraphicalReportHandlerTest {
                         "   · ╰── this bit here",
                         " 2 │   text",
                         "   ╰────",
-                        "",
                         "  help: try doing it better next time?",
                         ""),
                 builder.toString());
@@ -316,7 +613,6 @@ public class GraphicalReportHandlerTest {
                         "   ·       ╰── this bit here",
                         " 2 │   text",
                         "   ╰────",
-                        "",
                         "  help: try doing it better next time?",
                         ""),
                 builder.toString());
@@ -353,7 +649,6 @@ public class GraphicalReportHandlerTest {
                         "   ·     ╰── this bit here",
                         " 3 │     here",
                         "   ╰────",
-                        "",
                         "  help: try doing it better next time?",
                         ""),
                 builder.toString());
@@ -390,7 +685,6 @@ public class GraphicalReportHandlerTest {
                         "   ·     ╰── this bit here",
                         " 3 │     here",
                         "   ╰────",
-                        "",
                         "  help: try doing it better next time?",
                         ""),
                 builder.toString());
@@ -427,7 +721,6 @@ public class GraphicalReportHandlerTest {
                         "   ·   ╰── this bit here",
                         " 3 │     here",
                         "   ╰────",
-                        "",
                         "  help: try doing it better next time?",
                         ""),
                 builder.toString());
@@ -463,7 +756,6 @@ public class GraphicalReportHandlerTest {
                         "   ·   ────",
                         " 3 │     here",
                         "   ╰────",
-                        "",
                         "  help: try doing it better next time?",
                         ""),
                 builder.toString());
@@ -500,7 +792,6 @@ public class GraphicalReportHandlerTest {
                         "   ·   ╰── this bit here",
                         " 3 │     here",
                         "   ╰────",
-                        "",
                         "  help: try doing it better next time?",
                         ""),
                 builder.toString());
@@ -547,7 +838,6 @@ public class GraphicalReportHandlerTest {
                         "   ·     ╰── x",
                         " 3 │     here",
                         "   ╰────",
-                        "",
                         "  help: try doing it better next time?",
                         ""),
                 builder.toString());
@@ -595,7 +885,6 @@ public class GraphicalReportHandlerTest {
                         "   ·     ╰── x",
                         " 3 │     here",
                         "   ╰────",
-                        "",
                         "  help: try doing it better next time?",
                         ""),
                 builder.toString());
@@ -631,7 +920,6 @@ public class GraphicalReportHandlerTest {
                         " 3 │ ├─▶     here",
                         "   · ╰──── these two lines",
                         "   ╰────",
-                        "",
                         "  help: try doing it better next time?",
                         ""),
                 builder.toString());
@@ -674,7 +962,6 @@ public class GraphicalReportHandlerTest {
                         " 5 │ ├──▶ line5",
                         "   · ╰───── block 1",
                         "   ╰────",
-                        "",
                         "  help: try doing it better next time?",
                         ""),
                 builder.toString());
@@ -716,7 +1003,6 @@ public class GraphicalReportHandlerTest {
                         " 5 │ ├──▶ line5",
                         "   · ╰───── block 1",
                         "   ╰────",
-                        "",
                         "  help: try doing it better next time?",
                         ""),
                 builder.toString());
@@ -758,7 +1044,6 @@ public class GraphicalReportHandlerTest {
                         " 4 │ ├─▶ more here",
                         "   · ╰──── also this bit",
                         "   ╰────",
-                        "",
                         "  help: try doing it better next time?",
                         ""),
                 builder.toString());
@@ -815,7 +1100,7 @@ public class GraphicalReportHandlerTest {
                 Collections.emptyList());
 
         GraphicalReportHandler handler = new GraphicalReportHandler(
-                LinkStyle.Text,
+                LinkStyle.TEXT,
                 80,
                 GraphicalTheme.unicodeNoColour(),
                 null,
@@ -838,7 +1123,10 @@ public class GraphicalReportHandlerTest {
 
     @Test
     void testToString() {
-        ToStringVerifier.forClass(GraphicalReportHandler.class).verify();
+        ToStringVerifier
+                .forClass(GraphicalReportHandler.class)
+                .withIgnoredFields("ansiEscapePattern")
+                .verify();
     }
 
     @Property
@@ -848,7 +1136,7 @@ public class GraphicalReportHandlerTest {
             @ForAll @IntRange(min = 0, max = 200) int terminalWidth,
             @ForAll(supplier = GraphicalThemeSupplier.class) GraphicalTheme theme,
             @ForAll String footer,
-            @ForAll @IntRange(min = 0, max = 2) int contextLines,
+            @ForAll @IntRange(min = 0, max = 5) int contextLines,
             @ForAll boolean renderCauseChain) throws IOException {
         GraphicalReportHandler handler = new GraphicalReportHandler(
                 links,
