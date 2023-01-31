@@ -1141,7 +1141,7 @@ public class GraphicalReportHandlerTest {
         GraphicalReportHandler handler = new GraphicalReportHandler(
                 links,
                 terminalWidth,
-                GraphicalTheme.unicodeNoColour(),
+                theme,
                 footer,
                 contextLines,
                 renderCauseChain);
