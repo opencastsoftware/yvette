@@ -3,8 +3,6 @@ package com.opencastsoftware.yvette;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-import java.io.IOException;
-
 import org.junit.jupiter.api.Test;
 
 import com.jparams.verifier.tostring.ToStringVerifier;
@@ -12,7 +10,7 @@ import com.jparams.verifier.tostring.ToStringVerifier;
 import nl.jqno.equalsverifier.EqualsVerifier;
 
 public class StringSourceCodeTest {
-    private static String TEST_SOURCE = String.join(
+    private static final String TEST_SOURCE = String.join(
         System.lineSeparator(),
         "package com.opencastsoftware.yvette;",
         "",
@@ -24,7 +22,7 @@ public class StringSourceCodeTest {
     );
 
     @Test
-    void testNameString() throws IOException {
+    void testNameString() {
         StringSourceCode source = new StringSourceCode("TestSourceCode.java", TEST_SOURCE);
         assertThat(source.name(), is(equalTo("TestSourceCode.java")));
         StringRangeContents contents = source.readRange(new Range(0, 0, 6, 0), 1, 1);
@@ -32,7 +30,7 @@ public class StringSourceCodeTest {
     }
 
     @Test
-    void testReadEntireFile() throws IOException {
+    void testReadEntireFile() {
         StringSourceCode source = new StringSourceCode("TestSourceCode.java", TEST_SOURCE);
         StringRangeContents contents = source.readRange(new Range(0, 0, 6, 0), 1, 1);
         assertThat(contents.range(), is(equalTo(new Range(0, 0, 6, 0))));
@@ -48,7 +46,7 @@ public class StringSourceCodeTest {
     }
 
     @Test
-    void testReadFirstLine() throws IOException {
+    void testReadFirstLine() {
         StringSourceCode source = new StringSourceCode("TestSourceCode.java", TEST_SOURCE);
         StringRangeContents contents = source.readRange(new Range(0, 0, 0, 0), 1, 1);
         // First line, plus one line of context
@@ -60,7 +58,7 @@ public class StringSourceCodeTest {
     }
 
     @Test
-    void testReadMiddleLine() throws IOException {
+    void testReadMiddleLine() {
         StringSourceCode source = new StringSourceCode("TestSourceCode.java", TEST_SOURCE);
         StringRangeContents contents = source.readRange(new Range(3, 0, 3, 0), 1, 1);
         // Middle line, plus adjacent lines as context
@@ -73,7 +71,7 @@ public class StringSourceCodeTest {
     }
 
     @Test
-    void testReadLastLine() throws IOException {
+    void testReadLastLine() {
         StringSourceCode source = new StringSourceCode("TestSourceCode.java", TEST_SOURCE);
         StringRangeContents contents = source.readRange(new Range(6, 0, 6, 0), 1, 1);
         // Last line, plus one line of context

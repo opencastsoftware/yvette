@@ -47,23 +47,6 @@ public interface ThemeStyles {
         return style;
     }
 
-    static ThemeStyles forColourLevel(ColourSupport level) {
-        ThemeStyles styles = null;
-
-        switch (level) {
-            case COLOUR_16:
-                styles = ansi();
-            case COLOUR_256:
-                styles = ansi();
-            case COLOUR_16M:
-                styles = rgb();
-            case NONE:
-                styles = none();
-        }
-
-        return styles;
-    }
-
     static ThemeStyles ansi() {
         return new AnsiThemeStyles();
     }

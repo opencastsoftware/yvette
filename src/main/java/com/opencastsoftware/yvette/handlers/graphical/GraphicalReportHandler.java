@@ -27,7 +27,7 @@ public class GraphicalReportHandler implements ReportHandler {
     private final int contextLines;
     private final boolean renderCauseChain;
 
-    private final Pattern ansiEscapePattern = Pattern.compile("\\u001B\\[[;\\d]*m");
+    private static final Pattern ansiEscapePattern = Pattern.compile("\\u001B\\[[;\\d]*m");
 
     public GraphicalReportHandler(LinkStyle linkStyle, int terminalWidth, GraphicalTheme theme, String footer,
             int contextLines, boolean renderCauseChain) {
@@ -557,7 +557,7 @@ public class GraphicalReportHandler implements ReportHandler {
     }
 
     void renderRelated(Ansi ansi, Diagnostic diagnostic, SourceCode source) {
-
+        // TODO: Figure out how to align this with LSP
     }
 
     void renderFooter(Ansi ansi) throws IOException {
@@ -604,7 +604,6 @@ public class GraphicalReportHandler implements ReportHandler {
         result = prime * result + ((footer == null) ? 0 : footer.hashCode());
         result = prime * result + contextLines;
         result = prime * result + (renderCauseChain ? 1231 : 1237);
-        result = prime * result + ((ansiEscapePattern == null) ? 0 : ansiEscapePattern.hashCode());
         return result;
     }
 
@@ -634,11 +633,6 @@ public class GraphicalReportHandler implements ReportHandler {
         if (contextLines != other.contextLines)
             return false;
         if (renderCauseChain != other.renderCauseChain)
-            return false;
-        if (ansiEscapePattern == null) {
-            if (other.ansiEscapePattern != null)
-                return false;
-        } else if (!ansiEscapePattern.equals(other.ansiEscapePattern))
             return false;
         return true;
     }
@@ -711,13 +705,7 @@ public class GraphicalReportHandler implements ReportHandler {
         }
 
         public GraphicalReportHandler buildFor(Appendable output) {
-            int width;
-
-            if (terminalWidth.isPresent()) {
-                width = terminalWidth.get();
-            } else {
-                width = TerminalSupport.terminalWidth(output);
-            }
+            int width = terminalWidth.orElseGet(() -> TerminalSupport.terminalWidth(output));
 
             LinkStyle linkStyle;
             if (enableTerminalLinks.isPresent()) {

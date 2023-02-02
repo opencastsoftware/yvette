@@ -106,7 +106,7 @@ nexusPublishing {
 }
 
 tasks.named<Test>("test") {
-    useJUnitPlatform() {
+    useJUnitPlatform {
         includeEngines("junit-jupiter", "jqwik")
     }
 }

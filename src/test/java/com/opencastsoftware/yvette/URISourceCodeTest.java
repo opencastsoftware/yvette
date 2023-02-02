@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Objects;
 
 import org.junit.jupiter.api.Test;
 
@@ -18,8 +19,8 @@ public class URISourceCodeTest {
 
     static {
         try {
-            testSourceFile = URISourceCodeTest.class.getResource("TestSourceCode.java").toURI();
-        } catch (URISyntaxException e) {
+            testSourceFile = Objects.requireNonNull(URISourceCodeTest.class.getResource("TestSourceCode.java")).toURI();
+        } catch (NullPointerException | URISyntaxException e) {
             testSourceFile = null;
         }
     }

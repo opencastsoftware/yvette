@@ -49,7 +49,7 @@ public final class RgbThemeStyles implements ThemeStyles {
 
     @Override
     public UnaryOperator<Ansi> reset() {
-        return ansi -> ansi.reset();
+        return Ansi::reset;
     }
 
     @Override

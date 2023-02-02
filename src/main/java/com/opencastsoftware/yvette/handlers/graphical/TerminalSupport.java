@@ -204,12 +204,12 @@ class TerminalSupport {
 
     static boolean envVarIn(String varName, String... values) {
         String varValue = System.getenv(varName);
-        return varValue != null && Arrays.stream(values).anyMatch(v -> v.equals(varValue));
+        return varValue != null && Arrays.asList(values).contains(varValue);
     }
 
     static boolean envVarNotIn(String varName, String... values) {
         String varValue = System.getenv(varName);
-        return varValue != null && Arrays.stream(values).noneMatch(v -> v.equals(varValue));
+        return varValue != null && !Arrays.asList(values).contains(varValue);
     }
 
     static boolean envVarMatches(String varName, Predicate<String> valueFn) {
@@ -219,7 +219,7 @@ class TerminalSupport {
 
     static boolean envVarEquals(String varName, String onValue) {
         String varValue = System.getenv(varName);
-        return varValue != null && onValue.equals(varValue);
+        return onValue.equals(varValue);
     }
 
     static boolean envVarNotEquals(String varName, String offValue) {

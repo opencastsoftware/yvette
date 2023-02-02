@@ -17,7 +17,7 @@ import net.jqwik.api.Property;
 import nl.jqno.equalsverifier.EqualsVerifier;
 
 public class ToStringReportHandlerTest {
-    ToStringReportHandler handler = new ToStringReportHandler();
+    private final ToStringReportHandler handler = new ToStringReportHandler();
 
     @Test
     void testEquals() {

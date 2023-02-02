@@ -8,7 +8,7 @@ public enum ColourSupport {
 
     private final int level;
 
-    private ColourSupport(int level) {
+    ColourSupport(int level) {
         this.level = level;
     }
 
