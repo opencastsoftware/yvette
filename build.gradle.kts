@@ -52,7 +52,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
     testImplementation("org.hamcrest:hamcrest:2.2")
     testImplementation("net.jqwik:jqwik:1.7.2")
-    testImplementation("nl.jqno.equalsverifier:equalsverifier:3.12.4")
+    testImplementation("nl.jqno.equalsverifier:equalsverifier:3.13")
     testImplementation("com.jparams:to-string-verifier:1.4.8")
 }
 
