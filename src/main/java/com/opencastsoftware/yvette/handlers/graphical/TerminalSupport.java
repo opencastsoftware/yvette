@@ -110,16 +110,25 @@ class TerminalSupport {
     }
 
     static boolean checkAnsiColourSupport(String varName) {
-        return envVarIn(varName,
-                "screen", "xterm", "vt100",
-                "vt220", "rxvt", "color",
-                "ansi", "cygwin", "linux");
+        return envVarMatches(varName,
+                t -> t.startsWith("screen")
+                        || t.startsWith("xterm")
+                        || t.startsWith("vt100")
+                        || t.startsWith("vt220")
+                        || t.startsWith("rxvt")
+                        || t.contains("color")
+                        || t.contains("ansi")
+                        || t.contains("cygwin")
+                        || t.contains("linux"));
     }
 
     static boolean check256ColourSupport(String varName) {
         return envVarMatches(varName, t -> t.endsWith("256") || t.endsWith("256color"));
     }
 
+    /*
+     * A port of the logic from https://docs.rs/supports-color/2.0.0/supports_color/
+     */
     public static ColourSupport colourSupport(Appendable output) {
         if (envVarNotEquals("NO_COLOR", "") || envVarEquals("TERM", "dumb") || !isAtty(output)) {
             return ColourSupport.NONE;
