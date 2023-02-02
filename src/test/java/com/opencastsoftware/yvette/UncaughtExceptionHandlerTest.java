@@ -1,20 +1,17 @@
 package com.opencastsoftware.yvette;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AccessDeniedException;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.jupiter.api.Test;
 
+import com.opencastsoftware.yvette.handlers.ReportHandler;
 import com.opencastsoftware.yvette.handlers.graphical.GraphicalReportHandler;
-
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
 
 public class UncaughtExceptionHandlerTest {
 
@@ -53,6 +50,51 @@ public class UncaughtExceptionHandlerTest {
                             "  x Whoops!",
                             "  |-> Couldn't find the file BadFile.java",
                             "  `-> Access denied to file BadFile.java")));
+        } finally {
+            UncaughtExceptionHandler.uninstall();
+        }
+
+        assertThat(Thread.getDefaultUncaughtExceptionHandler(), is(nullValue()));
+    }
+
+    @Test
+    void handlesExceptionInHandler() throws InterruptedException, UnsupportedEncodingException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream printStream = new PrintStream(baos, true);
+
+        ReportHandler handler = new ReportHandler() {
+            @Override
+            public void display(Diagnostic diagnostic, Appendable output) throws IOException {
+                throw new IOException("Uh oh, this went very badly");
+            }
+        };
+
+        try {
+            UncaughtExceptionHandler.install(handler, printStream);
+
+            Thread throwingThread = new Thread(() -> {
+                Throwable exc = new FileNotFoundException("Couldn't find the file BadFile.java");
+                exc.initCause(new AccessDeniedException("Access denied to file BadFile.java"));
+                throw new RuntimeException("Whoops!", exc);
+            });
+
+            throwingThread.start();
+            throwingThread.join();
+
+            String diagnosticOutput = baos.toString(StandardCharsets.UTF_8.name());
+
+            assertThat(
+                    diagnosticOutput,
+                    containsString("Uncaught exception in thread"));
+
+            assertThat(
+                    diagnosticOutput,
+                    containsString("java.io.IOException: Uh oh, this went very badly"));
+
+            assertThat(
+                    diagnosticOutput,
+                    containsString("Suppressed: java.lang.RuntimeException: Whoops!"));
+
         } finally {
             UncaughtExceptionHandler.uninstall();
         }
