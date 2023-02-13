@@ -12,6 +12,8 @@ A diagnostic reporting library for Java, ported from the Rust library [miette](h
 
 ## Installation
 
+*yvette* is published for Java 11 and above.
+
 Gradle (build.gradle / build.gradle.kts):
 ```groovy
 implementation("com.opencastsoftware:yvette:0.1.0")
