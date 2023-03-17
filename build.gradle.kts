@@ -16,6 +16,7 @@ java {
 }
 
 dependencies {
+
     implementation(libs.apacheCommonsLang)
     implementation(libs.apacheCommonsText)
     "graphicalReportsApi"(libs.jansi)
