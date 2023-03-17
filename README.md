@@ -16,7 +16,7 @@ A diagnostic reporting library for Java, ported from the Rust library [miette](h
 
 Gradle (build.gradle / build.gradle.kts):
 ```groovy
-implementation("com.opencastsoftware:yvette:0.1.0")
+implementation("com.opencastsoftware:yvette:0.2.0")
 ```
 
 Maven (pom.xml):
@@ -24,7 +24,7 @@ Maven (pom.xml):
 <dependency>
     <groupId>com.opencastsoftware</groupId>
     <artifactId>yvette</artifactId>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
 </dependency>
 ```
 

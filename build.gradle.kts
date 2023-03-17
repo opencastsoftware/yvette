@@ -3,19 +3,16 @@ plugins {
     alias(libs.plugins.gradleJavaConventions)
 }
 
-repositories {
-    mavenCentral()
-}
+repositories { mavenCentral() }
 
 group = "com.opencastsoftware"
+
 description = "A diagnostic reporting library for Java"
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(11))
 
-    registerFeature("graphicalReports") {
-        usingSourceSet(sourceSets["main"])
-    }
+    registerFeature("graphicalReports") { usingSourceSet(sourceSets["main"]) }
 }
 
 dependencies {
@@ -74,8 +71,4 @@ mavenPublishing {
     }
 }
 
-tasks.named<Test>("test") {
-    useJUnitPlatform {
-        includeEngines("junit-jupiter", "jqwik")
-    }
-}
+tasks.named<Test>("test") { useJUnitPlatform { includeEngines("junit-jupiter", "jqwik") } }
