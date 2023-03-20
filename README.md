@@ -12,9 +12,11 @@ A diagnostic reporting library for Java, ported from the Rust library [miette](h
 
 ## Installation
 
+*yvette* is published for Java 8 and above.
+
 Gradle (build.gradle / build.gradle.kts):
 ```groovy
-implementation("com.opencastsoftware:yvette:0.1.0")
+implementation("com.opencastsoftware:yvette:0.2.0")
 ```
 
 Maven (pom.xml):
@@ -22,7 +24,7 @@ Maven (pom.xml):
 <dependency>
     <groupId>com.opencastsoftware</groupId>
     <artifactId>yvette</artifactId>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
 </dependency>
 ```
 
@@ -52,7 +54,7 @@ A [BasicDiagnostic](./src/main/java/com/opencastsoftware/yvette/BasicDiagnostic.
 Diagnostic err = new BasicDiagnostic(e.getMessage(), e.getCause());
 ```
 
-You can then implement a [ReportHandler](./src/main/java/com/opencastsoftware/yvette/handlers/ReportHandler.java) to display your diagnostics using the [Appendable](https://docs.oracle.com/javase/8/docs/api/java/lang/Appendable.html) instance you wish to use for output, for example [System.out](https://docs.oracle.com/javase/8/docs/api/java/lang/System.html#out), [System.err](https://docs.oracle.com/javase/8/docs/api/java/lang/System.html#err) or a [StringBuilder](https://docs.oracle.com/javase/8/docs/api/java/lang/StringBuilder.html).
+You can then implement a [ReportHandler](./src/main/java/com/opencastsoftware/yvette/handlers/ReportHandler.java) to display your diagnostics using the [Appendable](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Appendable.html) instance you wish to use for output, for example [System.out](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/System.html#out), [System.err](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/System.html#err) or a [StringBuilder](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/StringBuilder.html).
 
 *yvette* provides a [GraphicalReportHandler](./src/main/java/com/opencastsoftware/yvette/handlers/graphical/GraphicalReportHandler.java) which produces output like the screenshot above. You can create one of these using the `GraphicalReportHandler.builder()` static method:
 
@@ -73,7 +75,7 @@ reportHandler.display(diagnostic, System.err);
 
 ## Uncaught exception handler
 
-*yvette* provides an implementation of [Thread.UncaughtExceptionHandler](https://docs.oracle.com/javase/8/docs/api/java/lang/Thread.UncaughtExceptionHandler.html) which can be used to replace the default handler for all threads.
+*yvette* provides an implementation of [Thread.UncaughtExceptionHandler](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/Thread.UncaughtExceptionHandler.html) which can be used to replace the default handler for all threads.
 
 ```java
 import com.opencastsoftware.yvette.UncaughtExceptionHandler;
@@ -116,7 +118,7 @@ Caused by: java.nio.file.AccessDeniedException: Access denied to file BadFile.ja
 */
 ```
 
-It can also be set as the uncaught exception handler for new threads in a thread pool by using a [ThreadFactory](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ThreadFactory.html):
+It can also be set as the uncaught exception handler for new threads in a thread pool by using a [ThreadFactory](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/concurrent/ThreadFactory.html):
 
 ```java
 Thread.UncaughtExceptionHandler excHandler = UncaughtExceptionHandler.create(handler, System.err);

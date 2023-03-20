@@ -1,0 +1,24 @@
+[versions]
+apacheCommonsLang = "3.12.0"
+apacheCommonsText = "1.10.0"
+equalsVerifier = "3.13.1"
+gradleJavaConventions = "0.1.2"
+hamcrest = "2.2"
+jansi = "2.4.0"
+jacoco = "0.8.8"
+jqwik = "1.7.2"
+junit = "5.9.2"
+toStringVerifier = "1.4.8"
+
+[libraries]
+apacheCommonsLang = { module = "org.apache.commons:commons-lang3", version.ref = "apacheCommonsLang" }
+apacheCommonsText = { module = "org.apache.commons:commons-text", version.ref = "apacheCommonsText" }
+equalsVerifier = { module = "nl.jqno.equalsverifier:equalsverifier", version.ref = "equalsVerifier" }
+hamcrest = { module = "org.hamcrest:hamcrest", version.ref = "hamcrest" }
+jansi = { module = "org.fusesource.jansi:jansi", version.ref = "jansi" }
+jqwik = { module = "net.jqwik:jqwik", version.ref = "jqwik" }
+junitJupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
+toStringVerifier = { module = "com.jparams:to-string-verifier", version.ref = "toStringVerifier" }
+
+[plugins]
+gradleJavaConventions = { id = "com.opencastsoftware.gradle.java-conventions", version.ref = "gradleJavaConventions" }
