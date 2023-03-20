@@ -11,7 +11,6 @@ description = "A diagnostic reporting library for Java"
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(11))
-
     registerFeature("graphicalReports") { usingSourceSet(sourceSets["main"]) }
 }
 
@@ -69,6 +68,11 @@ mavenPublishing {
             url.set("https://github.com/opencastsoftware/yvette")
         }
     }
+}
+
+tasks.withType<JavaCompile>() {
+    // Target Java 8
+    options.release.set(8)
 }
 
 tasks.named<Test>("test") { useJUnitPlatform { includeEngines("junit-jupiter", "jqwik") } }
