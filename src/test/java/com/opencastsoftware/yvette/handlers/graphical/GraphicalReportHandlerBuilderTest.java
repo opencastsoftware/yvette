@@ -1,14 +1,16 @@
+/*
+ * SPDX-FileCopyrightText:  Copyright 2023 Opencast Software Europe Ltd
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package com.opencastsoftware.yvette.handlers.graphical;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-
-import org.junit.jupiter.api.Test;
 
 import com.jparams.verifier.tostring.ToStringVerifier;
 import com.opencastsoftware.yvette.LinkStyle;
-
 import nl.jqno.equalsverifier.EqualsVerifier;
+import org.junit.jupiter.api.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 public class GraphicalReportHandlerBuilderTest {
 

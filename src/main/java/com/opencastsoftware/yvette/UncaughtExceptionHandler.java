@@ -1,9 +1,13 @@
+/*
+ * SPDX-FileCopyrightText:  Copyright 2023 Opencast Software Europe Ltd
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package com.opencastsoftware.yvette;
+
+import com.opencastsoftware.yvette.handlers.ReportHandler;
 
 import java.io.IOException;
 import java.io.PrintStream;
-
-import com.opencastsoftware.yvette.handlers.ReportHandler;
 
 public class UncaughtExceptionHandler {
     private static volatile Thread.UncaughtExceptionHandler previous;

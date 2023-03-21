@@ -1,18 +1,20 @@
+/*
+ * SPDX-FileCopyrightText:  Copyright 2023 Opencast Software Europe Ltd
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package com.opencastsoftware.yvette;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import com.jparams.verifier.tostring.ToStringVerifier;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Objects;
 
-import org.junit.jupiter.api.Test;
-
-import com.jparams.verifier.tostring.ToStringVerifier;
-
-import nl.jqno.equalsverifier.EqualsVerifier;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 public class URISourceCodeTest {
     private static URI testSourceFile;

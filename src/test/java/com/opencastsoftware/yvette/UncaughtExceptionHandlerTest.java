@@ -1,17 +1,20 @@
+/*
+ * SPDX-FileCopyrightText:  Copyright 2023 Opencast Software Europe Ltd
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package com.opencastsoftware.yvette;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import com.opencastsoftware.yvette.handlers.ReportHandler;
+import com.opencastsoftware.yvette.handlers.graphical.GraphicalReportHandler;
+import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AccessDeniedException;
 import java.util.concurrent.*;
 
-import org.junit.jupiter.api.Test;
-
-import com.opencastsoftware.yvette.handlers.ReportHandler;
-import com.opencastsoftware.yvette.handlers.graphical.GraphicalReportHandler;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 public class UncaughtExceptionHandlerTest {
 

@@ -1,8 +1,20 @@
+/*
+ * SPDX-FileCopyrightText:  Copyright 2023 Opencast Software Europe Ltd
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package com.opencastsoftware.yvette.handlers.graphical;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import com.jparams.verifier.tostring.ToStringVerifier;
+import com.opencastsoftware.yvette.*;
+import com.opencastsoftware.yvette.arbitrary.DiagnosticSupplier;
+import com.opencastsoftware.yvette.arbitrary.GraphicalThemeSupplier;
+import com.opencastsoftware.yvette.arbitrary.LinkStyleSupplier;
+import net.jqwik.api.ForAll;
+import net.jqwik.api.Property;
+import net.jqwik.api.constraints.IntRange;
+import nl.jqno.equalsverifier.EqualsVerifier;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -11,19 +23,9 @@ import java.nio.file.AccessDeniedException;
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-
-import com.jparams.verifier.tostring.ToStringVerifier;
-import com.opencastsoftware.yvette.*;
-import com.opencastsoftware.yvette.arbitrary.DiagnosticSupplier;
-import com.opencastsoftware.yvette.arbitrary.GraphicalThemeSupplier;
-import com.opencastsoftware.yvette.arbitrary.LinkStyleSupplier;
-
-import net.jqwik.api.ForAll;
-import net.jqwik.api.Property;
-import net.jqwik.api.constraints.IntRange;
-import nl.jqno.equalsverifier.EqualsVerifier;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class GraphicalReportHandlerTest {
     private final GraphicalReportHandler handler = GraphicalReportHandler.builder()

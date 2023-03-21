@@ -1,8 +1,12 @@
+/*
+ * SPDX-FileCopyrightText:  Copyright 2023 Opencast Software Europe Ltd
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package com.opencastsoftware.yvette.handlers;
 
-import java.io.IOException;
-
 import com.opencastsoftware.yvette.Diagnostic;
+
+import java.io.IOException;
 
 public final class ToStringReportHandler implements ReportHandler {
     @Override
