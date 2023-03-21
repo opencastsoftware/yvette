@@ -1,4 +1,15 @@
+/*
+ * SPDX-FileCopyrightText:  Copyright 2023 Opencast Software Europe Ltd
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package com.opencastsoftware.yvette.handlers.graphical;
+
+import com.opencastsoftware.yvette.*;
+import com.opencastsoftware.yvette.handlers.ReportHandler;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.function.Failable;
+import org.fusesource.jansi.Ansi;
 
 import java.io.IOException;
 import java.util.*;
@@ -10,14 +21,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.function.Failable;
-import org.fusesource.jansi.Ansi;
-
-import com.opencastsoftware.yvette.*;
-import com.opencastsoftware.yvette.handlers.ReportHandler;
 
 public class GraphicalReportHandler implements ReportHandler {
     private final LinkStyle linkStyle;

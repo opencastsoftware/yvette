@@ -1,20 +1,22 @@
+/*
+ * SPDX-FileCopyrightText:  Copyright 2023 Opencast Software Europe Ltd
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package com.opencastsoftware.yvette.handlers;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-
-import java.io.IOException;
-
-import org.junit.jupiter.api.Test;
 
 import com.jparams.verifier.tostring.ToStringVerifier;
 import com.opencastsoftware.yvette.Diagnostic;
 import com.opencastsoftware.yvette.arbitrary.DiagnosticSupplier;
-
 import net.jqwik.api.ForAll;
 import net.jqwik.api.Property;
 import nl.jqno.equalsverifier.EqualsVerifier;
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 
 public class ToStringReportHandlerTest {
     private final ToStringReportHandler handler = new ToStringReportHandler();

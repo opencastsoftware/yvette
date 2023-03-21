@@ -1,8 +1,12 @@
+/*
+ * SPDX-FileCopyrightText:  Copyright 2023 Opencast Software Europe Ltd
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package com.opencastsoftware.yvette.handlers.graphical;
 
-import java.util.function.UnaryOperator;
-
 import org.fusesource.jansi.Ansi;
+
+import java.util.function.UnaryOperator;
 
 public class GraphicalTheme {
     private final ThemeCharacters characters;

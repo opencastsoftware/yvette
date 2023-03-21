@@ -1,13 +1,17 @@
+/*
+ * SPDX-FileCopyrightText:  Copyright 2023 Opencast Software Europe Ltd
+ * SPDX-License-Identifier: Apache-2.0
+ */
 package com.opencastsoftware.yvette.handlers.graphical;
-
-import java.io.PrintStream;
-import java.util.Arrays;
-import java.util.function.Predicate;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.fusesource.jansi.AnsiConsole;
 import org.fusesource.jansi.internal.CLibrary;
+
+import java.io.PrintStream;
+import java.util.Arrays;
+import java.util.function.Predicate;
 
 class TerminalSupport {
     public static boolean isAtty(Appendable output) {
