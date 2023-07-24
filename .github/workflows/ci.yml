@@ -16,15 +16,15 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3
         with:
           fetch-depth: 0
 
       - name: Validate Gradle Wrapper
-        uses: gradle/wrapper-validation-action@v1
+        uses: gradle/wrapper-validation-action@56b90f209b02bf6d1deae490e9ef18b21a389cd4 # v1
 
       - name: Download Java JDK
-        uses: typelevel/download-java@v2
+        uses: typelevel/download-java@817e8c0d48dc2e88e155a8e4f69ba493bef621be # v2
         id: download-java
         with:
           distribution: temurin
@@ -38,17 +38,17 @@ jobs:
           jdkFile: ${{ steps.download-java.outputs.jdkFile }}
 
       - name: Build & Test
-        uses: gradle/gradle-build-action@v2.6.1
+        uses: gradle/gradle-build-action@915a66c096a03101667f9df2e56c9efef558b165 # v2.6.1
         with:
           arguments: build --info
 
       - name: Upload Coverage Report
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@eaaf4bedf32dbdc6b720b63067d99c4d77d6047d # v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Publish Test Results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3
         if: always()
         with:
           name: test-results
@@ -56,6 +56,6 @@ jobs:
 
       - name: Publish To Sonatype
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
-        uses: gradle/gradle-build-action@v2.6.1
+        uses: gradle/gradle-build-action@915a66c096a03101667f9df2e56c9efef558b165 # v2.6.1
         with:
           arguments: publishAllPublicationsToMavenCentral
