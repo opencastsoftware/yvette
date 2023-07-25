@@ -43,6 +43,6 @@ jobs:
       - name: Generate Dependency Graph Snapshot
         uses: gradle/gradle-build-action@a4cf152f482c7ca97ef56ead29bf08bcd953284c # v2.7.0
         env:
-          DEPENDENCY_GRAPH_INCLUDE_CONFIGURATIONS: 'runtimeClasspath'
+          DEPENDENCY_GRAPH_INCLUDE_CONFIGURATIONS: 'compileClasspath|runtimeClasspath'
         with:
           arguments: build
