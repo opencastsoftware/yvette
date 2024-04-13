@@ -36,4 +36,4 @@ jobs:
           jdkFile: ${{ steps.download-java.outputs.jdkFile }}
 
       - name: Generate Dependency Graph Snapshot
-        uses: gradle/actions/dependency-submission@v3
+        uses: gradle/actions/dependency-submission@6cec5d49d4d6d4bb982fbed7047db31ea6d38f11 # v3
