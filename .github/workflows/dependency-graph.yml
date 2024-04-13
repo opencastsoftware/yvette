@@ -35,14 +35,5 @@ jobs:
           java-version: 11
           jdkFile: ${{ steps.download-java.outputs.jdkFile }}
 
-      - name: Setup Dependency Graph
-        uses: gradle/gradle-build-action@a8f75513eafdebd8141bd1cd4e30fcd194af8dfa # v2.12.0
-        with:
-          dependency-graph: generate-and-submit
-
       - name: Generate Dependency Graph Snapshot
-        uses: gradle/gradle-build-action@a8f75513eafdebd8141bd1cd4e30fcd194af8dfa # v2.12.0
-        env:
-          DEPENDENCY_GRAPH_INCLUDE_CONFIGURATIONS: 'compileClasspath|runtimeClasspath'
-        with:
-          arguments: build
+        uses: gradle/actions/dependency-submission@v3
