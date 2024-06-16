@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText:  Copyright 2023 Opencast Software Europe Ltd
+ * SPDX-FileCopyrightText:  © 2023-2024 Opencast Software Europe Ltd <https://opencastsoftware.com>
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.opencastsoftware.yvette.arbitrary;
 
+import com.opencastsoftware.prettier4j.Doc;
 import com.opencastsoftware.yvette.*;
 import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
@@ -29,13 +30,13 @@ public class DiagnosticSupplier implements ArbitrarySupplier<Diagnostic> {
                         return Arbitraries.just(
                                 new TestDiagnostic(
                                         code, severity,
-                                        message, help, url,
+                                        Doc.text(message), Doc.text(help), url,
                                         sourceCode, Collections.emptyList()));
                     } else {
                         return labels(sourceCode).map(labels -> {
                             return new TestDiagnostic(
                                     code, severity,
-                                    message, help, url,
+                                    Doc.text(message), Doc.text(help), url,
                                     sourceCode, labels);
                         });
                     }
@@ -76,6 +77,7 @@ public class DiagnosticSupplier implements ArbitrarySupplier<Diagnostic> {
      */
     private Arbitrary<Position> position(StringSourceCode source) {
         String[] lines = source.source().split("\\r?\\n");
+        if (lines.length == 0) { System.out.println(source.source()); }
         return Arbitraries.integers()
                 .between(0, Math.max(0, lines.length - 1))
                 .flatMap(line -> {

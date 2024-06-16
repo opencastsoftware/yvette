@@ -3,7 +3,10 @@ plugins {
     alias(libs.plugins.gradleJavaConventions)
 }
 
-repositories { mavenCentral() }
+repositories {
+    mavenCentral()
+    maven { url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/") }
+}
 
 group = "com.opencastsoftware"
 
@@ -17,6 +20,7 @@ java {
 dependencies {
     implementation(libs.apacheCommonsLang)
     implementation(libs.apacheCommonsText)
+    implementation(libs.prettier4j)
     "graphicalReportsApi"(libs.jansi)
     testImplementation(libs.junitJupiter)
     testImplementation(libs.hamcrest)
@@ -70,9 +74,13 @@ mavenPublishing {
     }
 }
 
-tasks.withType<JavaCompile>() {
+tasks.compileJava {
     // Target Java 8
     options.release.set(8)
 }
 
-tasks.named<Test>("test") { useJUnitPlatform { includeEngines("junit-jupiter", "jqwik") } }
+testing {
+    suites {
+        val test by getting(JvmTestSuite::class) { useJUnitJupiter(libs.versions.junit) }
+    }
+}

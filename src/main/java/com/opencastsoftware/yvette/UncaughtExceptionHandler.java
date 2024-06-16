@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText:  Copyright 2023 Opencast Software Europe Ltd
+ * SPDX-FileCopyrightText:  © 2023-2024 Opencast Software Europe Ltd <https://opencastsoftware.com>
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.opencastsoftware.yvette;
 
+import com.opencastsoftware.prettier4j.Doc;
 import com.opencastsoftware.yvette.handlers.ReportHandler;
 
 import java.io.IOException;
@@ -21,7 +22,7 @@ public class UncaughtExceptionHandler {
 
     public static Thread.UncaughtExceptionHandler create(ReportHandler handler, PrintStream output) {
         return (thread, exc) -> {
-            Diagnostic diagnostic = new BasicDiagnostic(exc.getMessage(), exc.getCause());
+            Diagnostic diagnostic = new BasicDiagnostic(Doc.text(exc.getMessage()), exc.getCause());
 
             output.format("Uncaught exception in thread %s: ", thread.getName());
 

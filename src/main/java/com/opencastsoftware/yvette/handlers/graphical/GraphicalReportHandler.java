@@ -1,9 +1,10 @@
 /*
- * SPDX-FileCopyrightText:  Copyright 2023 Opencast Software Europe Ltd
+ * SPDX-FileCopyrightText:  © 2023-2024 Opencast Software Europe Ltd <https://opencastsoftware.com>
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.opencastsoftware.yvette.handlers.graphical;
 
+import com.opencastsoftware.prettier4j.RenderOptions;
 import com.opencastsoftware.yvette.*;
 import com.opencastsoftware.yvette.handlers.ReportHandler;
 import org.apache.commons.lang3.ObjectUtils;
@@ -29,6 +30,7 @@ public class GraphicalReportHandler implements ReportHandler {
     private final String footer;
     private final int contextLines;
     private final boolean renderCauseChain;
+    private final RenderOptions renderOptions;
 
     private static final Pattern ansiEscapePattern = Pattern.compile("\\u001B\\[[;\\d]*m");
 
@@ -40,6 +42,9 @@ public class GraphicalReportHandler implements ReportHandler {
         this.footer = footer;
         this.contextLines = contextLines;
         this.renderCauseChain = renderCauseChain;
+        this.renderOptions = RenderOptions.builder()
+                .emitAnsiEscapes(!theme.styles().equals(ThemeStyles.none()))
+                .build();
     }
 
     void renderHeader(Ansi ansi, Diagnostic diagnostic) {
@@ -116,7 +121,7 @@ public class GraphicalReportHandler implements ReportHandler {
             TextWrap.fill(
                     ansi, lineWidth,
                     initialIndent, subsequentIndent,
-                    diagnostic.message());
+                    diagnostic.message().render(renderOptions));
 
             ansi.a(System.lineSeparator());
 
@@ -553,7 +558,7 @@ public class GraphicalReportHandler implements ReportHandler {
             TextWrap.fill(
                     ansi, lineWidth,
                     initialIndent, subsequentIndent,
-                    diagnostic.help());
+                    diagnostic.help().render(renderOptions));
 
             ansi.a(System.lineSeparator());
         }
@@ -598,53 +603,29 @@ public class GraphicalReportHandler implements ReportHandler {
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((linkStyle == null) ? 0 : linkStyle.hashCode());
-        result = prime * result + terminalWidth;
-        result = prime * result + ((theme == null) ? 0 : theme.hashCode());
-        result = prime * result + ((footer == null) ? 0 : footer.hashCode());
-        result = prime * result + contextLines;
-        result = prime * result + (renderCauseChain ? 1231 : 1237);
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GraphicalReportHandler that = (GraphicalReportHandler) o;
+        return terminalWidth == that.terminalWidth && contextLines == that.contextLines && renderCauseChain == that.renderCauseChain && linkStyle == that.linkStyle && Objects.equals(theme, that.theme) && Objects.equals(footer, that.footer) && Objects.equals(renderOptions, that.renderOptions);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        GraphicalReportHandler other = (GraphicalReportHandler) obj;
-        if (linkStyle != other.linkStyle)
-            return false;
-        if (terminalWidth != other.terminalWidth)
-            return false;
-        if (theme == null) {
-            if (other.theme != null)
-                return false;
-        } else if (!theme.equals(other.theme))
-            return false;
-        if (footer == null) {
-            if (other.footer != null)
-                return false;
-        } else if (!footer.equals(other.footer))
-            return false;
-        if (contextLines != other.contextLines)
-            return false;
-        if (renderCauseChain != other.renderCauseChain)
-            return false;
-        return true;
+    public int hashCode() {
+        return Objects.hash(linkStyle, terminalWidth, theme, footer, contextLines, renderCauseChain, renderOptions);
     }
 
     @Override
     public String toString() {
-        return "GraphicalReportHandler [linkStyle=" + linkStyle + ", terminalWidth=" + terminalWidth + ", theme="
-                + theme + ", footer=" + footer + ", contextLines=" + contextLines + ", renderCauseChain="
-                + renderCauseChain + "]";
+        return "GraphicalReportHandler[" +
+                "linkStyle=" + linkStyle +
+                ", terminalWidth=" + terminalWidth +
+                ", theme=" + theme +
+                ", footer='" + footer + '\'' +
+                ", contextLines=" + contextLines +
+                ", renderCauseChain=" + renderCauseChain +
+                ", renderOptions=" + renderOptions +
+                ']';
     }
 
     public static Builder builder() {

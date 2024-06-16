@@ -1,5 +1,5 @@
 /*
- * SPDX-FileCopyrightText:  Copyright 2023 Opencast Software Europe Ltd
+ * SPDX-FileCopyrightText:  © 2023-2024 Opencast Software Europe Ltd <https://opencastsoftware.com>
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.opencastsoftware.yvette;
@@ -41,7 +41,7 @@ public class UncaughtExceptionHandlerTest {
             throwingThread.start();
             throwingThread.join();
 
-            String diagnosticOutput = baos.toString(StandardCharsets.UTF_8.name());
+            String diagnosticOutput = baos.toString(StandardCharsets.UTF_8);
 
             assertThat(
                     diagnosticOutput,
@@ -65,11 +65,8 @@ public class UncaughtExceptionHandlerTest {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintStream printStream = new PrintStream(baos, true);
 
-        ReportHandler handler = new ReportHandler() {
-            @Override
-            public void display(Diagnostic diagnostic, Appendable output) throws IOException {
-                throw new IOException("Uh oh, this went very badly");
-            }
+        ReportHandler handler = (diagnostic, output) -> {
+            throw new IOException("Uh oh, this went very badly");
         };
 
         try {
@@ -84,7 +81,7 @@ public class UncaughtExceptionHandlerTest {
             throwingThread.start();
             throwingThread.join();
 
-            String diagnosticOutput = baos.toString(StandardCharsets.UTF_8.name());
+            String diagnosticOutput = baos.toString(StandardCharsets.UTF_8);
 
             assertThat(
                     diagnosticOutput,
@@ -142,7 +139,7 @@ public class UncaughtExceptionHandlerTest {
 
         assertThat("Executor should shut down", singleThread.awaitTermination(1, TimeUnit.SECONDS));
 
-        String diagnosticOutput = baos.toString(StandardCharsets.UTF_8.name());
+        String diagnosticOutput = baos.toString(StandardCharsets.UTF_8);
 
         assertThat(
                 diagnosticOutput,
