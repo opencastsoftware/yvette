@@ -21,7 +21,7 @@ jobs:
           fetch-depth: 0
 
       - name: Validate Gradle Wrapper
-        uses: gradle/actions/wrapper-validation@6cec5d49d4d6d4bb982fbed7047db31ea6d38f11 # v3
+        uses: gradle/actions/wrapper-validation@dbbdc275be76ac10734476cc723d82dfe7ec6eda # v3
 
       - name: Download Java JDK
         uses: typelevel/download-java@817e8c0d48dc2e88e155a8e4f69ba493bef621be # v2
@@ -38,7 +38,7 @@ jobs:
           jdkFile: ${{ steps.download-java.outputs.jdkFile }}
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@6cec5d49d4d6d4bb982fbed7047db31ea6d38f11 # v3
+        uses: gradle/actions/setup-gradle@dbbdc275be76ac10734476cc723d82dfe7ec6eda # v3
 
       - name: Build & Test
         run: ./gradlew build --info
