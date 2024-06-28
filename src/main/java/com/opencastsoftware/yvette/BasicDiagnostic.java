@@ -1,8 +1,10 @@
 /*
- * SPDX-FileCopyrightText:  Copyright 2023 Opencast Software Europe Ltd
+ * SPDX-FileCopyrightText:  © 2023-2024 Opencast Software Europe Ltd <https://opencastsoftware.com>
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.opencastsoftware.yvette;
+
+import com.opencastsoftware.prettier4j.Doc;
 
 import java.net.URI;
 import java.util.Collection;
@@ -10,23 +12,24 @@ import java.util.Collection;
 public class BasicDiagnostic extends Diagnostic {
     public String code;
     public Severity severity;
-    public String help;
+    public Doc message;
+    public Doc help;
     public URI url;
     public SourceCode sourceCode;
     public Collection<LabelledRange> labels;
 
-    public BasicDiagnostic(String message) {
+    public BasicDiagnostic(Doc message) {
         this(null, Severity.Error, message, null, null, null, null);
     }
 
     public BasicDiagnostic(
-            String message,
+            Doc message,
             Throwable cause) {
         this(null, Severity.Error, message, cause, null, null, null, null);
     }
 
     public BasicDiagnostic(
-            String message,
+            Doc message,
             Throwable cause,
             URI url) {
         this(null, Severity.Error, message, cause, null, url, null, null);
@@ -35,23 +38,25 @@ public class BasicDiagnostic extends Diagnostic {
     public BasicDiagnostic(
             String code,
             Severity severity,
-            String message,
-            String help,
+            Doc message,
+            Doc help,
             URI url,
             SourceCode sourceCode,
             Collection<LabelledRange> labels) {
-        super(message);
+        super();
+        this.message = message;
     }
 
     public BasicDiagnostic(
             String code,
             Severity severity,
-            String message, Throwable cause,
-            String help,
+            Doc message, Throwable cause,
+            Doc help,
             URI url,
             SourceCode sourceCode,
             Collection<LabelledRange> labels) {
-        super(message, cause);
+        super(cause);
+        this.message = message;
     }
 
     @Override
@@ -65,12 +70,12 @@ public class BasicDiagnostic extends Diagnostic {
     }
 
     @Override
-    public String message() {
-        return getMessage();
+    public Doc message() {
+        return message;
     }
 
     @Override
-    public String help() {
+    public Doc help() {
         return help;
     }
 

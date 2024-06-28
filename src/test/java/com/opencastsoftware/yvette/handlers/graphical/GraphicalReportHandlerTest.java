@@ -1,10 +1,11 @@
 /*
- * SPDX-FileCopyrightText:  Copyright 2023 Opencast Software Europe Ltd
+ * SPDX-FileCopyrightText:  © 2023-2024 Opencast Software Europe Ltd <https://opencastsoftware.com>
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.opencastsoftware.yvette.handlers.graphical;
 
 import com.jparams.verifier.tostring.ToStringVerifier;
+import com.opencastsoftware.prettier4j.Doc;
 import com.opencastsoftware.yvette.*;
 import com.opencastsoftware.yvette.arbitrary.DiagnosticSupplier;
 import com.opencastsoftware.yvette.arbitrary.GraphicalThemeSupplier;
@@ -45,9 +46,9 @@ public class GraphicalReportHandlerTest {
         Diagnostic err = new TestDiagnostic(
                 "oops-my-bad",
                 Severity.Error,
-                "Couldn't attach the source code to your diagnostic",
+                Doc.text("Couldn't attach the source code to your diagnostic"),
                 exc,
-                "try doing it better next time?",
+                Doc.text("try doing it better next time?"),
                 null,
                 null,
                 Collections.emptyList());
@@ -82,9 +83,9 @@ public class GraphicalReportHandlerTest {
         Diagnostic err = new TestDiagnostic(
                 "oops-my-bad",
                 Severity.Error,
-                "Couldn't attach the source code to your diagnostic",
+                Doc.text("Couldn't attach the source code to your diagnostic"),
                 exc,
-                "try doing it better next time?",
+                Doc.text("try doing it better next time?"),
                 null,
                 null,
                 Collections.emptyList());
@@ -116,7 +117,7 @@ public class GraphicalReportHandlerTest {
                 Severity.Error,
                 null,
                 exc,
-                "try doing it better next time?",
+                Doc.text("try doing it better next time?"),
                 null,
                 null,
                 Collections.emptyList());
@@ -142,9 +143,9 @@ public class GraphicalReportHandlerTest {
         Diagnostic err = new TestDiagnostic(
                 "oops-my-bad",
                 Severity.Error,
-                "Couldn't attach the source code to your diagnostic",
+                Doc.text("Couldn't attach the source code to your diagnostic"),
                 exc,
-                "try doing it better next time?",
+                Doc.text("try doing it better next time?"),
                 null,
                 null,
                 Collections.emptyList());
@@ -172,9 +173,9 @@ public class GraphicalReportHandlerTest {
         Diagnostic err = new TestDiagnostic(
                 "oops-my-bad",
                 Severity.Error,
-                "Couldn't attach the source code to your diagnostic",
+                Doc.text("Couldn't attach the source code to your diagnostic"),
                 exc,
-                "try doing it better next time?",
+                Doc.text("try doing it better next time?"),
                 null,
                 null,
                 Collections.emptyList());
@@ -199,8 +200,8 @@ public class GraphicalReportHandlerTest {
         Diagnostic err = new TestDiagnostic(
                 "oops-my-bad",
                 Severity.Error,
-                "oops!",
-                "try doing it better next time?",
+                Doc.text("oops!"),
+                Doc.text("try doing it better next time?"),
                 null,
                 new StringSourceCode("BadFile.java", ""),
                 Collections.singletonList(
@@ -230,8 +231,8 @@ public class GraphicalReportHandlerTest {
         Diagnostic err = new TestDiagnostic(
                 "oops-my-bad",
                 Severity.Error,
-                "oops!",
-                "try doing it better next time?",
+                Doc.text("oops!"),
+                Doc.text("try doing it better next time?"),
                 null,
                 new StringSourceCode(null, ""),
                 Collections.singletonList(
@@ -261,8 +262,8 @@ public class GraphicalReportHandlerTest {
         Diagnostic err = new TestDiagnostic(
                 "oops-my-bad",
                 Severity.Error,
-                "oops!",
-                "try doing it better next time?",
+                Doc.text("oops!"),
+                Doc.text("try doing it better next time?"),
                 null,
                 new StringSourceCode(null, "source"),
                 Collections.singletonList(
@@ -295,7 +296,7 @@ public class GraphicalReportHandlerTest {
         Diagnostic err = new TestDiagnostic(
                 null,
                 Severity.Error,
-                "oops!",
+                Doc.text("oops!"),
                 null,
                 null,
                 new StringSourceCode("Issue.java", "source\ntext"),
@@ -328,7 +329,7 @@ public class GraphicalReportHandlerTest {
         Diagnostic err = new TestDiagnostic(
                 null,
                 Severity.Error,
-                "oops!",
+                Doc.text("oops!"),
                 null,
                 null,
                 new StringSourceCode("Issue.java", "source\ntext\nhere\nand\nsome\nmore"),
@@ -373,7 +374,7 @@ public class GraphicalReportHandlerTest {
         Diagnostic err = new TestDiagnostic(
                 null,
                 Severity.Error,
-                "oops!",
+                Doc.text("oops!"),
                 null,
                 null,
                 new StringSourceCode(null, "source\ntext"),
@@ -406,8 +407,8 @@ public class GraphicalReportHandlerTest {
         Diagnostic err = new TestDiagnostic(
                 "oops-my-bad",
                 Severity.Error,
-                "oops!",
-                "try doing it better next time?",
+                Doc.text("oops!"),
+                Doc.text("try doing it better next time?"),
                 null,
                 new StringSourceCode(
                         "BadFile.java", "source\n  👼🏼text\n    here"),
@@ -444,8 +445,8 @@ public class GraphicalReportHandlerTest {
         Diagnostic err = new TestDiagnostic(
                 "oops-my-bad",
                 Severity.Error,
-                "oops!",
-                "try doing it better next time?",
+                Doc.text("oops!"),
+                Doc.text("try doing it better next time?"),
                 null,
                 new StringSourceCode(
                         "BadFile.java", "source\n\t\ttext\n    here"),
@@ -482,8 +483,8 @@ public class GraphicalReportHandlerTest {
         Diagnostic err = new TestDiagnostic(
                 "oops-my-bad",
                 Severity.Error,
-                "oops!",
-                "try doing it better next time?",
+                Doc.text("oops!"),
+                Doc.text("try doing it better next time?"),
                 null,
                 new StringSourceCode(
                         "BadFile.java", "source\ntext =\ttext\n    here"),
@@ -519,8 +520,8 @@ public class GraphicalReportHandlerTest {
         Diagnostic err = new TestDiagnostic(
                 "oops-my-bad",
                 Severity.Error,
-                "oops!",
-                "try doing it better next time?",
+                Doc.text("oops!"),
+                Doc.text("try doing it better next time?"),
                 null,
                 new StringSourceCode("BadFile.java", "source\n  text\n    here"),
                 Collections.singletonList(
@@ -555,8 +556,8 @@ public class GraphicalReportHandlerTest {
         Diagnostic err = new TestDiagnostic(
                 "oops-my-bad",
                 Severity.Error,
-                "oops!",
-                "try doing it better next time?",
+                Doc.text("oops!"),
+                Doc.text("try doing it better next time?"),
                 null,
                 new StringSourceCode("BadFile.java", "source\n  text\n    here"),
                 Collections.singletonList(
@@ -590,8 +591,8 @@ public class GraphicalReportHandlerTest {
         Diagnostic err = new TestDiagnostic(
                 "oops-my-bad",
                 Severity.Error,
-                "oops!",
-                "try doing it better next time?",
+                Doc.text("oops!"),
+                Doc.text("try doing it better next time?"),
                 null,
                 new StringSourceCode("BadFile.java", "source\n  text\n    here"),
                 Collections.singletonList(
@@ -625,8 +626,8 @@ public class GraphicalReportHandlerTest {
         Diagnostic err = new TestDiagnostic(
                 "oops-my-bad",
                 Severity.Error,
-                "oops!",
-                "try doing it better next time?",
+                Doc.text("oops!"),
+                Doc.text("try doing it better next time?"),
                 null,
                 new StringSourceCode("BadFile.java", "source\n  text\n    here"),
                 Collections.singletonList(
@@ -661,8 +662,8 @@ public class GraphicalReportHandlerTest {
         Diagnostic err = new TestDiagnostic(
                 "oops-my-bad",
                 Severity.Error,
-                "oops!",
-                "try doing it better next time?",
+                Doc.text("oops!"),
+                Doc.text("try doing it better next time?"),
                 null,
                 new StringSourceCode("BadFile.java", "source\n  text\r\n    here"),
                 Collections.singletonList(
@@ -697,8 +698,8 @@ public class GraphicalReportHandlerTest {
         Diagnostic err = new TestDiagnostic(
                 "oops-my-bad",
                 Severity.Error,
-                "oops!",
-                "try doing it better next time?",
+                Doc.text("oops!"),
+                Doc.text("try doing it better next time?"),
                 null,
                 new StringSourceCode("BadFile.java", "source\n  text\n    here"),
                 Collections.singletonList(
@@ -733,8 +734,8 @@ public class GraphicalReportHandlerTest {
         Diagnostic err = new TestDiagnostic(
                 "oops-my-bad",
                 Severity.Error,
-                "oops!",
-                "try doing it better next time?",
+                Doc.text("oops!"),
+                Doc.text("try doing it better next time?"),
                 null,
                 new StringSourceCode("BadFile.java", "source\n  text\n    here"),
                 Collections.singletonList(
@@ -768,8 +769,8 @@ public class GraphicalReportHandlerTest {
         Diagnostic err = new TestDiagnostic(
                 "oops-my-bad",
                 Severity.Error,
-                "oops!",
-                "try doing it better next time?",
+                Doc.text("oops!"),
+                Doc.text("try doing it better next time?"),
                 null,
                 new StringSourceCode("BadFile.java", "source\ntext\n    here"),
                 Collections.singletonList(
@@ -804,8 +805,8 @@ public class GraphicalReportHandlerTest {
         Diagnostic err = new TestDiagnostic(
                 "oops-my-bad",
                 Severity.Error,
-                "oops!",
-                "try doing it better next time?",
+                Doc.text("oops!"),
+                Doc.text("try doing it better next time?"),
                 null,
                 new StringSourceCode("BadFile.java", "source\n  text text text text text\n    here"),
                 Arrays.asList(
@@ -851,8 +852,8 @@ public class GraphicalReportHandlerTest {
         Diagnostic err = new TestDiagnostic(
                 "oops-my-bad",
                 Severity.Error,
-                "oops!",
-                "try doing it better next time?",
+                Doc.text("oops!"),
+                Doc.text("try doing it better next time?"),
                 null,
                 new StringSourceCode("BadFile.java", "source\n  text text text\ttext text\n    here"),
                 Arrays.asList(
@@ -897,8 +898,8 @@ public class GraphicalReportHandlerTest {
         Diagnostic err = new TestDiagnostic(
                 "oops-my-bad",
                 Severity.Error,
-                "oops!",
-                "try doing it better next time?",
+                Doc.text("oops!"),
+                Doc.text("try doing it better next time?"),
                 null,
                 new StringSourceCode("BadFile.java", "source\n  text\n    here"),
                 Collections.singletonList(
@@ -932,8 +933,8 @@ public class GraphicalReportHandlerTest {
         Diagnostic err = new TestDiagnostic(
                 "oops-my-bad",
                 Severity.Error,
-                "oops!",
-                "try doing it better next time?",
+                Doc.text("oops!"),
+                Doc.text("try doing it better next time?"),
                 null,
                 new StringSourceCode("BadFile.java", "line1\nline2\nline3\nline4\nline5\n"),
                 Arrays.asList(
@@ -974,8 +975,8 @@ public class GraphicalReportHandlerTest {
         Diagnostic err = new TestDiagnostic(
                 "oops-my-bad",
                 Severity.Error,
-                "oops!",
-                "try doing it better next time?",
+                Doc.text("oops!"),
+                Doc.text("try doing it better next time?"),
                 null,
                 new StringSourceCode("BadFile.java", "line1\nline2\nline3\nline4\nline5\n"),
                 Arrays.asList(
@@ -1015,8 +1016,8 @@ public class GraphicalReportHandlerTest {
         Diagnostic err = new TestDiagnostic(
                 "oops-my-bad",
                 Severity.Error,
-                "oops!",
-                "try doing it better next time?",
+                Doc.text("oops!"),
+                Doc.text("try doing it better next time?"),
                 null,
                 new StringSourceCode("BadFile.java", "source\n  text\n    here\nmore here"),
                 Arrays.asList(
@@ -1056,8 +1057,8 @@ public class GraphicalReportHandlerTest {
         Diagnostic err = new TestDiagnostic(
                 "oops-my-bad",
                 Severity.Error,
-                "oops!",
-                "try doing it better next time?",
+                Doc.text("oops!"),
+                Doc.text("try doing it better next time?"),
                 URI.create("https://example.com"),
                 null,
                 Collections.emptyList());
@@ -1076,8 +1077,8 @@ public class GraphicalReportHandlerTest {
         Diagnostic err = new TestDiagnostic(
                 null,
                 Severity.Error,
-                "oops!",
-                "try doing it better next time?",
+                Doc.text("oops!"),
+                Doc.text("try doing it better next time?"),
                 URI.create("https://example.com"),
                 null,
                 Collections.emptyList());
@@ -1095,8 +1096,8 @@ public class GraphicalReportHandlerTest {
         Diagnostic err = new TestDiagnostic(
                 "oops-my-bad",
                 Severity.Error,
-                "oops!",
-                "try doing it better next time?",
+                Doc.text("oops!"),
+                Doc.text("try doing it better next time?"),
                 URI.create("https://example.com"),
                 null,
                 Collections.emptyList());

@@ -1,33 +1,33 @@
 /*
- * SPDX-FileCopyrightText:  Copyright 2023 Opencast Software Europe Ltd
+ * SPDX-FileCopyrightText:  © 2023-2024 Opencast Software Europe Ltd <https://opencastsoftware.com>
  * SPDX-License-Identifier: Apache-2.0
  */
 package com.opencastsoftware.yvette;
+
+import com.opencastsoftware.prettier4j.Doc;
 
 import java.net.URI;
 import java.util.Collection;
 
 public abstract class Diagnostic extends RuntimeException {
     public abstract String code();
+    public abstract Doc message();
     public abstract Severity severity();
-    public abstract String help();
+    public abstract Doc help();
     public abstract URI url();
     public abstract SourceCode sourceCode();
     public abstract Collection<LabelledRange> labels();
 
-    public Diagnostic(String message) {
-        super(message);
+    public Diagnostic() {
+        super();
     }
 
     public Diagnostic(Throwable cause) {
         super(cause);
     }
 
-    public Diagnostic(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public String message() {
-        return getMessage();
+    @Override
+    public String getMessage() {
+        return message().render();
     }
 }
