@@ -19,7 +19,7 @@ jobs:
           fetch-depth: 0
 
       - name: Validate Gradle Wrapper
-        uses: gradle/wrapper-validation-action@56b90f209b02bf6d1deae490e9ef18b21a389cd4 # v1
+        uses: gradle/actions/wrapper-validation@6cec5d49d4d6d4bb982fbed7047db31ea6d38f11 # v3
 
       - name: Download Java JDK
         uses: typelevel/download-java@817e8c0d48dc2e88e155a8e4f69ba493bef621be # v2
