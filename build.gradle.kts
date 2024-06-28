@@ -3,10 +3,7 @@ plugins {
     alias(libs.plugins.gradleJavaConventions)
 }
 
-repositories {
-    mavenCentral()
-    maven { url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/") }
-}
+repositories { mavenCentral() }
 
 group = "com.opencastsoftware"
 
