@@ -19,7 +19,7 @@ jobs:
           fetch-depth: 0
 
       - name: Validate Gradle Wrapper
-        uses: gradle/actions/wrapper-validation@dbbdc275be76ac10734476cc723d82dfe7ec6eda # v3
+        uses: gradle/actions/wrapper-validation@0bdd871935719febd78681f197cd39af5b6e16a6 # v4
 
       - name: Download Java JDK
         uses: typelevel/download-java@817e8c0d48dc2e88e155a8e4f69ba493bef621be # v2
@@ -36,4 +36,4 @@ jobs:
           jdkFile: ${{ steps.download-java.outputs.jdkFile }}
 
       - name: Generate Dependency Graph Snapshot
-        uses: gradle/actions/dependency-submission@dbbdc275be76ac10734476cc723d82dfe7ec6eda # v3
+        uses: gradle/actions/dependency-submission@0bdd871935719febd78681f197cd39af5b6e16a6 # v4
