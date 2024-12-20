@@ -34,3 +34,5 @@ jobs:
 
       - name: Generate Dependency Graph Snapshot
         uses: gradle/actions/dependency-submission@v4
+        env:
+          DEPENDENCY_GRAPH_INCLUDE_CONFIGURATIONS: 'compileClasspath|runtimeClasspath'
