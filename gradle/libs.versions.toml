@@ -1,7 +1,7 @@
 [versions]
 apacheCommonsLang = "3.17.0"
 apacheCommonsText = "1.13.0"
-equalsVerifier = "3.19"
+equalsVerifier = "3.19.1"
 gradleJavaConventions = "0.1.4"
 hamcrest = "3.0"
 jansi = "2.4.1"
