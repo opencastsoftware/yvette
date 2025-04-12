@@ -7,7 +7,7 @@ hamcrest = "3.0"
 jansi = "2.4.1"
 jacoco = "0.8.8"
 jqwik = "1.9.2"
-junit = "5.12.1"
+junit = "5.12.2"
 prettier4j = "0.3.1"
 toStringVerifier = "1.4.8"
 
