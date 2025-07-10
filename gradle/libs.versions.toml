@@ -1,5 +1,5 @@
 [versions]
-apacheCommonsLang = "3.17.0"
+apacheCommonsLang = "3.18.0"
 apacheCommonsText = "1.13.1"
 equalsVerifier = "3.19.4"
 gradleJavaConventions = "0.2.0"
