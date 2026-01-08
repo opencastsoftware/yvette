@@ -10,7 +10,7 @@ group = "com.opencastsoftware"
 description = "A diagnostic reporting library for Java"
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(11))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
     registerFeature("graphicalReports") { usingSourceSet(sourceSets["main"]) }
 }
 
@@ -19,11 +19,22 @@ dependencies {
     implementation(libs.apacheCommonsText)
     implementation(libs.prettier4j)
     "graphicalReportsApi"(libs.jansi)
-    testImplementation(libs.junitJupiter)
-    testImplementation(libs.hamcrest)
-    testImplementation(libs.jqwik)
-    testImplementation(libs.equalsVerifier)
-    testImplementation(libs.toStringVerifier)
+}
+
+testing {
+    suites {
+        val test by
+            getting(JvmTestSuite::class) {
+                dependencies {
+                    implementation(libs.junitJupiter)
+                    implementation(libs.hamcrest)
+                    implementation(libs.jqwik)
+                    implementation(libs.equalsVerifier)
+                    implementation(libs.toStringVerifier)
+                    runtimeOnly(libs.junitPlatformLauncher)
+                }
+            }
+    }
 }
 
 mavenPublishing {
@@ -74,10 +85,4 @@ mavenPublishing {
 tasks.compileJava {
     // Target Java 8
     options.release.set(8)
-}
-
-testing {
-    suites {
-        val test by getting(JvmTestSuite::class) { useJUnitJupiter(libs.versions.junit) }
-    }
 }
