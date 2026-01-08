@@ -7,7 +7,7 @@ hamcrest = "3.0"
 jansi = "2.4.2"
 jacoco = "0.8.8"
 jqwik = "1.9.3"
-junit = "5.14.2"
+junit = "6.0.2"
 prettier4j = "0.3.2"
 toStringVerifier = "1.4.8"
 
@@ -19,6 +19,7 @@ hamcrest = { module = "org.hamcrest:hamcrest", version.ref = "hamcrest" }
 jansi = { module = "org.fusesource.jansi:jansi", version.ref = "jansi" }
 jqwik = { module = "net.jqwik:jqwik", version.ref = "jqwik" }
 junitJupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
+junitPlatformLauncher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit" }
 prettier4j = { module = "com.opencastsoftware:prettier4j", version.ref = "prettier4j" }
 toStringVerifier = { module = "com.jparams:to-string-verifier", version.ref = "toStringVerifier" }
 
