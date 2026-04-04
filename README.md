@@ -4,6 +4,7 @@
 [![codecov](https://codecov.io/gh/opencastsoftware/yvette/branch/main/graph/badge.svg?token=JHVF151VM1)](https://codecov.io/gh/opencastsoftware/yvette)
 [![Maven Central](https://img.shields.io/maven-central/v/com.opencastsoftware/yvette)](https://search.maven.org/search?q=g%3Acom.opencastsoftware+AND+a%3Ayvette)
 [![javadoc](https://javadoc.io/badge2/com.opencastsoftware/yvette/javadoc.svg)](https://javadoc.io/doc/com.opencastsoftware/yvette)
+![JDK Support](https://img.shields.io/badge/dynamic/regex?url=https%3A%2F%2Fraw.githubusercontent.com%2Fopencastsoftware%2Fyvette%2Frefs%2Fheads%2Fmain%2Fbuild.gradle.kts&search=options%5C.release%5C.set%5C((.*)%5C)&replace=%241%2B&logo=openjdk&label=JDK)
 [![License](https://img.shields.io/github/license/opencastsoftware/yvette?color=blue)](https://spdx.org/licenses/Apache-2.0.html)
 
 A diagnostic reporting library for Java, ported from the Rust library [miette](https://github.com/zkat/miette).
