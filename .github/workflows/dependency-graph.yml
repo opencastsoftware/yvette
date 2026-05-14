@@ -33,6 +33,6 @@ jobs:
           jdkFile: ${{ steps.download-java.outputs.jdkFile }}
 
       - name: Generate Dependency Graph Snapshot
-        uses: gradle/actions/dependency-submission@4d9f0ba0025fe599b4ebab900eb7f3a1d93ef4c2 # v5
+        uses: gradle/actions/dependency-submission@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e # v6
         env:
           DEPENDENCY_GRAPH_INCLUDE_CONFIGURATIONS: 'compileClasspath|runtimeClasspath'
